@@ -1,0 +1,1403 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>MHcoding API - AI Coding Tools Guide</title>
+    <meta name="description" content="MHcoding API：一个 API Key，连接 Claude Code、Codex CLI、Gemini CLI。" />
+
+    <!-- Prism.js (Syntax Highlight) -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <style>
+        /* =========================
+       Theme Variables
+    ========================= */
+        :root {
+            --bg0: #0f0f23;
+            --bg1: #0b1023;
+            --panel: rgba(255, 255, 255, 0.06);
+            --panel2: rgba(255, 255, 255, 0.08);
+            --border: rgba(255, 255, 255, 0.12);
+            --text: #e8eaf6;
+            --muted: rgba(232, 234, 246, 0.72);
+            --shadow: 0 18px 60px rgba(0, 0, 0, 0.45);
+            --blur: 16px;
+
+            --accent: #7c3aed;
+            /* default accent (hero) */
+            --accent2: #22c55e;
+
+            --radius: 22px;
+            --radius2: 16px;
+
+            --navH: 72px;
+
+            --codeBg: rgba(10, 14, 28, 0.78);
+            --codeBorder: rgba(255, 255, 255, 0.12);
+            --chip: rgba(255, 255, 255, 0.08);
+            --chipHover: rgba(255, 255, 255, 0.12);
+            --focus: 0 0 0 3px rgba(124, 58, 237, 0.35);
+
+            --grid: rgba(255, 255, 255, 0.06);
+        }
+
+        html[data-theme="light"] {
+            --bg0: #f6f7fb;
+            --bg1: #eef2ff;
+            --panel: rgba(255, 255, 255, 0.62);
+            --panel2: rgba(255, 255, 255, 0.75);
+            --border: rgba(15, 23, 42, 0.10);
+            --text: #0f172a;
+            --muted: rgba(15, 23, 42, 0.66);
+            --shadow: 0 18px 60px rgba(15, 23, 42, 0.12);
+
+            --codeBg: rgba(255, 255, 255, 0.9);
+            --codeBorder: rgba(15, 23, 42, 0.10);
+            --chip: rgba(15, 23, 42, 0.06);
+            --chipHover: rgba(15, 23, 42, 0.10);
+            --grid: rgba(15, 23, 42, 0.06);
+        }
+
+        /* =========================
+       Base
+    ========================= */
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+            color: var(--text);
+            background:
+                radial-gradient(1200px 800px at 10% 10%, rgba(124, 58, 237, 0.18), transparent 55%),
+                radial-gradient(1200px 800px at 90% 20%, rgba(34, 197, 94, 0.12), transparent 52%),
+                linear-gradient(180deg, var(--bg0), var(--bg1));
+            overflow-x: hidden;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .container {
+            width: min(1100px, calc(100% - 44px));
+            margin: 0 auto;
+        }
+
+        /* smooth scroll + section snap-ish feel */
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: calc(var(--navH) + 18px);
+        }
+
+        /* =========================
+       Top Nav
+    ========================= */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--navH);
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            backdrop-filter: blur(var(--blur));
+            -webkit-backdrop-filter: blur(var(--blur));
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.40), rgba(0, 0, 0, 0.10));
+            border-bottom: 1px solid var(--border);
+        }
+
+        html[data-theme="light"] .nav {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.40));
+        }
+
+        .navInner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+        }
+
+        .logo {
+            width: 38px;
+            height: 38px;
+            border-radius: 14px;
+            background:
+                radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), transparent 45%),
+                linear-gradient(135deg, rgba(124, 58, 237, 0.95), rgba(34, 197, 94, 0.85));
+            box-shadow: 0 10px 35px rgba(124, 58, 237, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+        }
+
+        .navLinks {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .navLinks a {
+            padding: 10px 12px;
+            border-radius: 12px;
+            color: var(--muted);
+            font-weight: 600;
+            font-size: 14px;
+            background: transparent;
+            transition: 180ms ease;
+        }
+
+        .navLinks a:hover {
+            background: var(--chipHover);
+            color: var(--text);
+            transform: translateY(-1px);
+        }
+
+        .navActions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 11px 14px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: var(--chip);
+            color: var(--text);
+            font-weight: 700;
+            cursor: pointer;
+            transition: 180ms ease;
+            user-select: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            background: var(--chipHover);
+        }
+
+        .btn:focus {
+            outline: none;
+            box-shadow: var(--focus);
+        }
+
+        .btnPrimary {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.92), rgba(34, 197, 94, 0.78));
+            border-color: rgba(255, 255, 255, 0.18);
+            box-shadow: 0 18px 55px rgba(124, 58, 237, 0.22);
+        }
+
+        .btnPrimary:hover {
+            filter: brightness(1.05);
+        }
+
+        .icon {
+            width: 18px;
+            height: 18px;
+            display: inline-block;
+            opacity: 0.92;
+        }
+
+        /* =========================
+       Sections
+    ========================= */
+        section {
+            min-height: 100vh;
+            padding: calc(var(--navH) + 40px) 0 56px;
+            position: relative;
+        }
+
+        .hero {
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* background grid */
+        .gridOverlay {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(var(--grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+            background-size: 42px 42px;
+            mask-image: radial-gradient(closest-side at 50% 30%, rgba(0, 0, 0, 0.75), transparent 85%);
+            pointer-events: none;
+            opacity: 0.9;
+        }
+
+        /* Animated blur balls */
+        .blur-balls {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .ball {
+            position: absolute;
+            width: 480px;
+            height: 480px;
+            border-radius: 999px;
+            filter: blur(40px);
+            opacity: 0.65;
+            transform: translate3d(0, 0, 0);
+            animation: floaty 14s ease-in-out infinite;
+            will-change: transform;
+        }
+
+        .ball.b1 {
+            left: -160px;
+            top: -120px;
+            background: radial-gradient(circle at 30% 30%, rgba(124, 58, 237, 0.95), rgba(124, 58, 237, 0.05));
+            animation-duration: 16s;
+        }
+
+        .ball.b2 {
+            right: -210px;
+            top: 90px;
+            background: radial-gradient(circle at 30% 30%, rgba(34, 197, 94, 0.85), rgba(34, 197, 94, 0.05));
+            animation-duration: 18s;
+            animation-delay: -4s;
+        }
+
+        .ball.b3 {
+            left: 30%;
+            bottom: -240px;
+            width: 560px;
+            height: 560px;
+            background: radial-gradient(circle at 30% 30%, rgba(66, 133, 244, 0.70), rgba(66, 133, 244, 0.05));
+            animation-duration: 20s;
+            animation-delay: -7s;
+        }
+
+        @keyframes floaty {
+            0% {
+                transform: translate(0px, 0px) scale(1);
+            }
+
+            35% {
+                transform: translate(24px, 18px) scale(1.05);
+            }
+
+            65% {
+                transform: translate(-18px, 22px) scale(0.98);
+            }
+
+            100% {
+                transform: translate(0px, 0px) scale(1);
+            }
+        }
+
+        .heroGrid {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 26px;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .kicker {
+            display: inline-flex;
+            gap: 10px;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--muted);
+            font-weight: 700;
+            font-size: 13px;
+            width: fit-content;
+        }
+
+        .h1 {
+            margin: 14px 0 10px;
+            font-size: clamp(34px, 4.3vw, 56px);
+            line-height: 1.05;
+            letter-spacing: -0.6px;
+        }
+
+        .lead {
+            margin: 0 0 20px;
+            font-size: clamp(16px, 1.45vw, 18px);
+            line-height: 1.65;
+            color: var(--muted);
+            max-width: 56ch;
+        }
+
+        .heroActions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .heroSide {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .statCard {
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--panel);
+            backdrop-filter: blur(var(--blur));
+            -webkit-backdrop-filter: blur(var(--blur));
+            box-shadow: var(--shadow);
+            padding: 16px 16px 14px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .statCard::before {
+            content: "";
+            position: absolute;
+            inset: -1px;
+            background: radial-gradient(400px 180px at 10% 10%, rgba(124, 58, 237, 0.22), transparent 60%),
+                radial-gradient(420px 220px at 95% 30%, rgba(34, 197, 94, 0.16), transparent 58%);
+            opacity: 0.9;
+            pointer-events: none;
+        }
+
+        .statCard>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        .statRow {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .statTitle {
+            font-weight: 900;
+            letter-spacing: -0.3px;
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .statDesc {
+            margin: 6px 0 0;
+            color: var(--muted);
+            line-height: 1.55;
+            font-size: 14px;
+        }
+
+        .pill {
+            font-size: 12px;
+            font-weight: 900;
+            padding: 7px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text);
+            white-space: nowrap;
+        }
+
+        /* =========================
+       Tool Sections
+    ========================= */
+        .toolHeader {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .toolTitle {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toolMark {
+            width: 44px;
+            height: 44px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: var(--panel);
+            box-shadow: 0 18px 55px rgba(0, 0, 0, 0.25);
+            display: grid;
+            place-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .toolMark::before {
+            content: "";
+            position: absolute;
+            inset: -2px;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.45), transparent 55%);
+            opacity: 0.55;
+        }
+
+        .toolMark span {
+            position: relative;
+            z-index: 1;
+            font-weight: 1000;
+            letter-spacing: -0.4px;
+            font-size: 15px;
+        }
+
+        .toolTitle h2 {
+            margin: 0;
+            font-size: clamp(24px, 2.6vw, 34px);
+            letter-spacing: -0.5px;
+        }
+
+        .toolTitle p {
+            margin: 6px 0 0;
+            color: var(--muted);
+            max-width: 72ch;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .toolGrid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .card {
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--panel);
+            backdrop-filter: blur(var(--blur));
+            -webkit-backdrop-filter: blur(var(--blur));
+            box-shadow: var(--shadow);
+            padding: 18px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::after {
+            content: "";
+            position: absolute;
+            inset: -1px;
+            background: radial-gradient(520px 260px at 0% 0%, rgba(255, 255, 255, 0.12), transparent 60%);
+            opacity: 0.55;
+            pointer-events: none;
+        }
+
+        .card>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        .cardHeader {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .cardHeader h3 {
+            margin: 0;
+            font-size: 16px;
+            letter-spacing: -0.2px;
+        }
+
+        .cardHeader .hint {
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .tab {
+            padding: 9px 12px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: var(--chip);
+            color: var(--muted);
+            font-weight: 900;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 180ms ease;
+            user-select: none;
+        }
+
+        .tab:hover {
+            background: var(--chipHover);
+            color: var(--text);
+            transform: translateY(-1px);
+        }
+
+        .tab[aria-selected="true"] {
+            color: var(--text);
+            border-color: rgba(255, 255, 255, 0.22);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06) inset;
+        }
+
+        .codeWrap {
+            border-radius: var(--radius2);
+            border: 1px solid var(--codeBorder);
+            background: var(--codeBg);
+            overflow: hidden;
+        }
+
+        .codeTop {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--codeBorder);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .codeTop .label {
+            font-size: 12px;
+            font-weight: 900;
+            color: var(--muted);
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        .copyBtn {
+            padding: 8px 10px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text);
+            font-weight: 900;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 180ms ease;
+            user-select: none;
+        }
+
+        .copyBtn:hover {
+            transform: translateY(-1px);
+            background: rgba(255, 255, 255, 0.10);
+        }
+
+        .copyBtn:focus {
+            outline: none;
+            box-shadow: var(--focus);
+        }
+
+        pre {
+            margin: 0;
+            padding: 12px 14px 14px;
+            overflow: auto;
+            max-height: 320px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .feat {
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px 12px;
+            min-height: 74px;
+        }
+
+        .feat b {
+            display: block;
+            font-size: 13px;
+            letter-spacing: -0.1px;
+            margin-bottom: 6px;
+        }
+
+        .feat span {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .callout {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px;
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--muted);
+            line-height: 1.55;
+            font-size: 13px;
+            margin-top: 12px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            margin-top: 4px;
+            flex: none;
+            background: var(--accent);
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.06);
+        }
+
+        /* tool accents */
+        .tool[data-tool="claude"] {
+            --accent: #D97757;
+            --accent2: rgba(217, 119, 87, 0.28);
+        }
+
+        .tool[data-tool="codex"] {
+            --accent: #10B981;
+            --accent2: rgba(16, 185, 129, 0.26);
+        }
+
+        .tool[data-tool="gemini"] {
+            --accent: #4285f4;
+            --accent2: rgba(66, 133, 244, 0.24);
+        }
+
+        .tool .toolMark {
+            background:
+                radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.24), transparent 55%),
+                linear-gradient(135deg, color-mix(in srgb, var(--accent) 95%, #fff 0%), rgba(255, 255, 255, 0.08));
+            border-color: rgba(255, 255, 255, 0.16);
+        }
+
+        .tool .tab[aria-selected="true"] {
+            background: color-mix(in srgb, var(--accent) 18%, rgba(255, 255, 255, 0.06));
+            border-color: color-mix(in srgb, var(--accent) 35%, rgba(255, 255, 255, 0.18));
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, rgba(255, 255, 255, 0.06)) inset;
+        }
+
+        .tool .dot {
+            background: var(--accent);
+        }
+
+        .tool .btnPrimary {
+            background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 92%, #000 0%), rgba(255, 255, 255, 0.10));
+            box-shadow: 0 18px 55px color-mix(in srgb, var(--accent) 24%, rgba(0, 0, 0, 0.35));
+        }
+
+        /* =========================
+       Footer
+    ========================= */
+        footer {
+            padding: 48px 0 70px;
+            border-top: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.10);
+        }
+
+        html[data-theme="light"] footer {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .footerRow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .footerRow p {
+            margin: 0;
+            color: var(--muted);
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        /* =========================
+       Toast
+    ========================= */
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 22px;
+            transform: translateX(-50%);
+            z-index: 80;
+            padding: 10px 12px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.45);
+            color: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(var(--blur));
+            -webkit-backdrop-filter: blur(var(--blur));
+            font-weight: 900;
+            font-size: 12px;
+            letter-spacing: 0.2px;
+            opacity: 0;
+            pointer-events: none;
+            transition: 220ms ease;
+            box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+        }
+
+        html[data-theme="light"] .toast {
+            background: rgba(255, 255, 255, 0.72);
+            color: rgba(15, 23, 42, 0.92);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-4px);
+        }
+
+        /* =========================
+       Responsive
+    ========================= */
+        @media (max-width: 920px) {
+            .heroGrid {
+                grid-template-columns: 1fr;
+            }
+
+            .toolGrid {
+                grid-template-columns: 1fr;
+            }
+
+            .navLinks {
+                display: none;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .btn {
+                padding: 10px 12px;
+                border-radius: 13px;
+            }
+
+            .card {
+                padding: 16px;
+            }
+
+            pre {
+                max-height: 360px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Reduce motion */
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+
+            .ball {
+                animation: none;
+            }
+
+            .btn:hover,
+            .tab:hover,
+            .copyBtn:hover {
+                transform: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- NAV -->
+    <header class="nav" role="navigation" aria-label="Top Navigation">
+        <div class="container navInner">
+            <a class="brand" href="#top" aria-label="MHcoding API Home">
+                <div class="logo" aria-hidden="true"></div>
+                <div>
+                    <div style="font-size:14px; opacity:.9;">MHcoding API</div>
+                    <div style="font-size:12px; color:var(--muted); font-weight:800;">AI Coding Tools Guide</div>
+                </div>
+            </a>
+
+            <nav class="navLinks" aria-label="Section Links">
+                <a href="#claude">Claude Code</a>
+                <a href="#codex">Codex CLI</a>
+                <a href="#gemini">Gemini CLI</a>
+                <a href="#footer">Quick Start</a>
+            </nav>
+
+            <div class="navActions">
+                <button class="btn" id="themeToggle" type="button" aria-label="Toggle Theme" title="主题切换">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12Z" stroke="currentColor" stroke-width="2" />
+                        <path
+                            d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                    <span id="themeLabel">暗色</span>
+                </button>
+                <a class="btn btnPrimary" href="#claude" aria-label="Get Started">
+                    开始使用
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M5 12h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        <path d="M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO -->
+    <section id="top" class="hero">
+        <div class="blur-balls" aria-hidden="true">
+            <div class="ball b1"></div>
+            <div class="ball b2"></div>
+            <div class="ball b3"></div>
+        </div>
+        <div class="gridOverlay" aria-hidden="true"></div>
+
+        <div class="container heroGrid">
+            <div>
+                <div class="kicker">
+                    <span class="pill">One Key</span>
+                    <span>连接 Claude Code / Codex CLI / Gemini CLI</span>
+                </div>
+                <h1 class="h1">MHcoding API：统一的 AI 编程工具网关</h1>
+                <p class="lead">
+                    一个 API Key，连接 Claude Code、Codex CLI、Gemini CLI。安装、配置、鉴权、模型选择一次搞定。
+                    页面按工具分区，全屏滚动，代码示例优先。
+                </p>
+                <div class="heroActions">
+                    <a class="btn btnPrimary" href="#claude">从 Claude Code 开始</a>
+                    <button class="btn" type="button" id="copyQuickKey"
+                        data-copy="export NEWAPI_API_KEY=&quot;YOUR_API_KEY&quot;">
+                        复制环境变量示例
+                    </button>
+                </div>
+            </div>
+
+            <div class="heroSide">
+                <div class="statCard">
+                    <div class="statRow">
+                        <div>
+                            <p class="statTitle">为什么用 MHcoding API？</p>
+                            <p class="statDesc">统一鉴权、统一网关、统一观测，让 CLI 工具像“接同一个后端”一样简单。</p>
+                        </div>
+                        <span class="pill">Gateway</span>
+                    </div>
+                </div>
+                <div class="statCard">
+                    <div class="statRow">
+                        <div>
+                            <p class="statTitle">全屏分区滚动</p>
+                            <p class="statDesc">每个工具一个 section：安装命令、配置文件、核心能力、注意事项。</p>
+                        </div>
+                        <span class="pill">Scroll</span>
+                    </div>
+                </div>
+                <div class="statCard">
+                    <div class="statRow">
+                        <div>
+                            <p class="statTitle">代码优先</p>
+                            <p class="statDesc">Prism.js 高亮 + 一键复制，适合直接贴进终端与配置文件。</p>
+                        </div>
+                        <span class="pill">Code</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CLAUDE -->
+    <section id="claude" class="tool" data-tool="claude" aria-label="Claude Code Section">
+        <div class="container">
+            <div class="toolHeader">
+                <div class="toolTitle">
+                    <div class="toolMark" aria-hidden="true"><span>C</span></div>
+                    <div>
+                        <h2>Claude Code</h2>
+                        <p>偏“结对编程”体验：适合代码理解、重构、测试生成与复杂任务拆解。用 MHcoding API 统一转发与鉴权。</p>
+                    </div>
+                </div>
+                <a class="btn" href="#codex" aria-label="Next: Codex CLI">
+                    下一个：Codex
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M5 12h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        <path d="M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </a>
+            </div>
+
+            <div class="toolGrid">
+                <!-- Install -->
+                <div class="card">
+                    <div class="cardHeader">
+                        <h3>安装命令</h3>
+                        <div class="hint">选择平台 → 一键复制</div>
+                    </div>
+
+                    <div class="tabs" role="tablist" aria-label="Claude install platform">
+                        <button class="tab" role="tab" aria-selected="true" data-target="claude"
+                            data-platform="mac">Mac</button>
+                        <button class="tab" role="tab" aria-selected="false" data-target="claude"
+                            data-platform="windows">Windows</button>
+                        <button class="tab" role="tab" aria-selected="false" data-target="claude"
+                            data-platform="npm">npm</button>
+                    </div>
+
+                    <div class="codeWrap">
+                        <div class="codeTop">
+                            <span class="label">Terminal</span>
+                            <button class="copyBtn" type="button" data-copy-from="#claudeInstall">复制</button>
+                        </div>
+                        <pre><code id="claudeInstall" class="language-bash"># macOS (示例)
+brew install claude-code</code></pre>
+                    </div>
+
+                    <div class="callout">
+                        <span class="dot" aria-hidden="true"></span>
+                        <div>提示：如果你使用公司镜像源/代理，优先在终端里配置好 HTTP(S)_PROXY 或 npm registry。</div>
+                    </div>
+                </div>
+
+                <!-- Config -->
+                <div class="card">
+                    <div class="cardHeader">
+                        <h3>MHcoding API 配置示例</h3>
+                        <div class="hint">将网关与 Key 注入 CLI</div>
+                    </div>
+
+                    <div class="codeWrap">
+                        <div class="codeTop">
+                            <span class="label">config.json</span>
+                            <button class="copyBtn" type="button" data-copy-from="#claudeConfig">复制</button>
+                        </div>
+                        <pre><code id="claudeConfig" class="language-json">{
+  "provider": "mhcoding-api",
+  "base_url": "https://YOUR_MHCODING_HOST/v1",
+  "api_key_env": "NEWAPI_API_KEY",
+  "model": "claude-4.5-sonnet",
+  "headers": {
+    "X-Client": "claude-code"
+  }
+}</code></pre>
+                    </div>
+
+                    <div class="features">
+                        <div class="feat">
+                            <b>长上下文与理解力</b>
+                            <span>适合读大仓库、解释复杂模块与设计取舍。</span>
+                        </div>
+                        <div class="feat">
+                            <b>重构与测试</b>
+                            <span>把“改动→验证→回滚”做成可控流程。</span>
+                        </div>
+                        <div class="feat">
+                            <b>风格一致性</b>
+                            <span>配合规则/提示词，稳定输出团队风格。</span>
+                        </div>
+                        <div class="feat">
+                            <b>网关统一鉴权</b>
+                            <span>只维护一个 Key，按工具/模型路由。</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CODEX -->
+    <section id="codex" class="tool" data-tool="codex" aria-label="Codex CLI Section">
+        <div class="container">
+            <div class="toolHeader">
+                <div class="toolTitle">
+                    <div class="toolMark" aria-hidden="true"><span>O</span></div>
+                    <div>
+                        <h2>Codex CLI</h2>
+                        <p>面向终端的高效编码助手：适合脚本生成、项目初始化、批量改动与可复现的命令式工作流。</p>
+                    </div>
+                </div>
+                <a class="btn" href="#gemini" aria-label="Next: Gemini CLI">
+                    下一个：Gemini
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M5 12h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        <path d="M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </a>
+            </div>
+
+            <div class="toolGrid">
+                <!-- Install -->
+                <div class="card">
+                    <div class="cardHeader">
+                        <h3>安装命令</h3>
+                        <div class="hint">平台选择 / 可复制</div>
+                    </div>
+
+                    <div class="tabs" role="tablist" aria-label="Codex install platform">
+                        <button class="tab" role="tab" aria-selected="true" data-target="codex"
+                            data-platform="mac">Mac</button>
+                        <button class="tab" role="tab" aria-selected="false" data-target="codex"
+                            data-platform="windows">Windows</button>
+                        <button class="tab" role="tab" aria-selected="false" data-target="codex"
+                            data-platform="npm">npm</button>
+                    </div>
+
+                    <div class="codeWrap">
+                        <div class="codeTop">
+                            <span class="label">Terminal</span>
+                            <button class="copyBtn" type="button" data-copy-from="#codexInstall">复制</button>
+                        </div>
+                        <pre><code id="codexInstall" class="language-bash"># macOS (示例)
+brew install codex</code></pre>
+                    </div>
+
+                    <div class="callout">
+                        <span class="dot" aria-hidden="true"></span>
+                        <div>建议：把常用指令封装成脚本/Makefile，让 AI 输出更容易落地与复现。</div>
+                    </div>
+                </div>
+
+                <!-- Config -->
+                <div class="card">
+                    <div class="cardHeader">
+                        <h3>MHcoding API 配置示例</h3>
+                        <div class="hint">统一 endpoint + key</div>
+                    </div>
+
+                    <div class="codeWrap">
+                        <div class="codeTop">
+                            <span class="label">.env / config</span>
+                            <button class="copyBtn" type="button" data-copy-from="#codexConfig">复制</button>
+                        </div>
+                        <pre><code id="codexConfig" class="language-bash"># 方式 A：环境变量（推荐）
+export NEWAPI_API_KEY="YOUR_API_KEY"
+export NEWAPI_BASE_URL="https://YOUR_MHCODING_HOST/v1"
+
+# 方式 B：Codex CLI 参数（示例）
+codex --base-url "$NEWAPI_BASE_URL" --api-key "$NEWAPI_API_KEY"</code></pre>
+                    </div>
+
+                    <div class="features">
+                        <div class="feat">
+                            <b>命令式工作流</b>
+                            <span>适合脚手架、批量变更与自动化操作。</span>
+                        </div>
+                        <div class="feat">
+                            <b>可复现性强</b>
+                            <span>把提示词/命令固化进脚本，便于团队协作。</span>
+                        </div>
+                        <div class="feat">
+                            <b>工具链融合</b>
+                            <span>与 Git / CI / Lint / Test 组合，减少手工步骤。</span>
+                        </div>
+                        <div class="feat">
+                            <b>统一网关路由</b>
+                            <span>在 MHcoding API 内按模型/成本/权限策略分发。</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GEMINI -->
+    <section id="gemini" class="tool" data-tool="gemini" aria-label="Gemini CLI Section">
+        <div class="container">
+            <div class="toolHeader">
+                <div class="toolTitle">
+                    <div class="toolMark" aria-hidden="true"><span>G</span></div>
+                    <div>
+                        <h2>Gemini CLI</h2>
+                        <p>偏多模态与工程效率：适合与文档、规范、代码生成联动。通过 MHcoding API 统一鉴权与可观测。</p>
+                    </div>
+                </div>
+                <a class="btn" href="#footer" aria-label="Go to Footer">
+                    进入 Quick Start
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M12 5v14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        <path d="M6 13l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </a>
+            </div>
+
+            <div class="toolGrid">
+                <!-- Install -->
+                <div class="card">
+                    <div class="cardHeader">
+                        <h3>安装命令</h3>
+                        <div class="hint">平台选择 / 可复制</div>
+                    </div>
+
+                    <div class="tabs" role="tablist" aria-label="Gemini install platform">
+                        <button class="tab" role="tab" aria-selected="true" data-target="gemini"
+                            data-platform="mac">Mac</button>
+                        <button class="tab" role="tab" aria-selected="false" data-target="gemini"
+                            data-platform="windows">Windows</button>
+                        <button class="tab" role="tab" aria-selected="false" data-target="gemini"
+                            data-platform="npm">npm</button>
+                    </div>
+
+                    <div class="codeWrap">
+                        <div class="codeTop">
+                            <span class="label">Terminal</span>
+                            <button class="copyBtn" type="button" data-copy-from="#geminiInstall">复制</button>
+                        </div>
+                        <pre><code id="geminiInstall" class="language-bash"># macOS (示例)
+brew install gemini-cli</code></pre>
+                    </div>
+
+                    <div class="callout">
+                        <span class="dot" aria-hidden="true"></span>
+                        <div>建议：把规范/接口文档放进提示上下文，输出更贴近真实工程约束。</div>
+                    </div>
+                </div>
+
+                <!-- Config -->
+                <div class="card">
+                    <div class="cardHeader">
+                        <h3>MHcoding API 配置示例</h3>
+                        <div class="hint">示例为“网关转发”结构</div>
+                    </div>
+
+                    <div class="codeWrap">
+                        <div class="codeTop">
+                            <span class="label">config.json</span>
+                            <button class="copyBtn" type="button" data-copy-from="#geminiConfig">复制</button>
+                        </div>
+                        <pre><code id="geminiConfig" class="language-json">{
+  "provider": "mhcoding-api",
+  "base_url": "https://YOUR_MHCODING_HOST/v1",
+  "api_key_env": "NEWAPI_API_KEY",
+  "model": "gemini-2.5-pro",
+  "headers": {
+    "X-Client": "gemini-cli"
+  }
+}</code></pre>
+                    </div>
+
+                    <div class="features">
+                        <div class="feat">
+                            <b>文档驱动开发</b>
+                            <span>从 PRD/接口/规范生成实现与测试。</span>
+                        </div>
+                        <div class="feat">
+                            <b>多模态潜力</b>
+                            <span>在需要时融合截图/图表/说明（按工具能力）。</span>
+                        </div>
+                        <div class="feat">
+                            <b>长链路任务</b>
+                            <span>适合“需求 → 方案 → 实现 → 验证”的流水线。</span>
+                        </div>
+                        <div class="feat">
+                            <b>网关观测</b>
+                            <span>统一记录调用来源、模型与成本（按你的网关能力）。</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer id="footer" aria-label="Footer">
+        <div class="container">
+            <div class="footerRow">
+                <div>
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                        <div class="logo" aria-hidden="true" style="width:34px;height:34px;border-radius:14px;"></div>
+                        <div style="font-weight:1000; letter-spacing:-0.3px;">Quick Start</div>
+                    </div>
+                    <p>1) 设置 <b>NEWAPI_API_KEY</b> → 2) 选择工具 → 3) 复制安装/配置 → 4) 开始编码。</p>
+                </div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button class="btn btnPrimary" type="button"
+                        data-copy="export NEWAPI_API_KEY=&quot;YOUR_API_KEY&quot;&#10;export NEWAPI_BASE_URL=&quot;https://YOUR_MHCODING_HOST/v1&quot;">
+                        复制 Quick Start
+                    </button>
+                    <a class="btn" href="#top">回到顶部</a>
+                </div>
+            </div>
+
+            <div style="margin-top:22px; color:var(--muted); font-weight:800; font-size:12px;">
+                © <span id="year"></span> MHcoding API. Built for developers. Dark-first, light-ready.
+            </div>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast" role="status" aria-live="polite">已复制到剪贴板</div>
+
+    <script>
+        // =========================
+        // Theme toggle (CSS vars + localStorage)
+        // =========================
+        (function initTheme() {
+            const saved = localStorage.getItem("newapi_theme");
+            const prefersLight = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
+
+            const theme = saved || (prefersLight ? "light" : "dark");
+            document.documentElement.setAttribute("data-theme", theme);
+
+            const themeLabel = document.getElementById("themeLabel");
+            themeLabel.textContent = theme === "dark" ? "暗色" : "浅色";
+
+            document.getElementById("themeToggle").addEventListener("click", () => {
+                const current = document.documentElement.getAttribute("data-theme") || "dark";
+                const next = current === "dark" ? "light" : "dark";
+                document.documentElement.setAttribute("data-theme", next);
+                localStorage.setItem("newapi_theme", next);
+                themeLabel.textContent = next === "dark" ? "暗色" : "浅色";
+            });
+        })();
+
+        // =========================
+        // Copy helpers + Toast
+        // =========================
+        const toastEl = document.getElementById("toast");
+        let toastTimer = null;
+
+        function showToast(text) {
+            toastEl.textContent = text || "已复制到剪贴板";
+            toastEl.classList.add("show");
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toastEl.classList.remove("show"), 1400);
+        }
+
+        async function copyText(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                showToast("已复制 ✓");
+            } catch (e) {
+                // Fallback
+                const ta = document.createElement("textarea");
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand("copy");
+                document.body.removeChild(ta);
+                showToast("已复制 ✓");
+            }
+        }
+
+        // Buttons with data-copy
+        document.addEventListener("click", (e) => {
+            const btn = e.target.closest("[data-copy]");
+            if (btn) {
+                const raw = btn.getAttribute("data-copy") || "";
+                // decode HTML entities for quotes/newlines from attributes
+                const txt = raw
+                    .replaceAll("&quot;", "\"")
+                    .replaceAll("&#10;", "\n")
+                    .replaceAll("&#9;", "\t");
+                copyText(txt);
+            }
+        });
+
+        // Copy buttons referencing code blocks
+        document.querySelectorAll(".copyBtn[data-copy-from]").forEach((b) => {
+            b.addEventListener("click", () => {
+                const sel = b.getAttribute("data-copy-from");
+                const el = document.querySelector(sel);
+                if (!el) return;
+                copyText(el.textContent);
+            });
+        });
+
+        // =========================
+        // Platform tabs (per tool)
+        // =========================
+        const installCommands = {
+            claude: {
+                mac: `# macOS (示例)\nbrew install claude-code`,
+                windows: `# Windows (示例)\nwinget install ClaudeCode\n# 或使用 scoop/choco 视环境而定`,
+                npm: `# npm (示例)\nnpm i -g @anthropic-ai/claude-code`
+            },
+            codex: {
+                mac: `# macOS (示例)\nbrew install codex`,
+                windows: `# Windows (示例)\nwinget install CodexCLI\n# 或使用 scoop/choco 视环境而定`,
+                npm: `# npm (示例)\nnpm i -g @openai/codex-cli`
+            },
+            gemini: {
+                mac: `# macOS (示例)\nbrew install gemini-cli`,
+                windows: `# Windows (示例)\nwinget install GeminiCLI\n# 或使用 scoop/choco 视环境而定`,
+                npm: `# npm (示例)\nnpm i -g @google/gemini-cli`
+            }
+        };
+
+        function setTabState(groupButtons, activeBtn) {
+            groupButtons.forEach(btn => btn.setAttribute("aria-selected", btn === activeBtn ? "true" : "false"));
+        }
+
+        function updateInstall(tool, platform) {
+            const map = {
+                claude: "#claudeInstall",
+                codex: "#codexInstall",
+                gemini: "#geminiInstall",
+            };
+            const selector = map[tool];
+            const codeEl = document.querySelector(selector);
+            if (!codeEl) return;
+
+            codeEl.textContent = installCommands[tool][platform] || "";
+            // re-highlight this block
+            if (window.Prism && Prism.highlightElement) {
+                Prism.highlightElement(codeEl);
+            }
+        }
+
+        document.querySelectorAll(".tab[data-target][data-platform]").forEach((tab) => {
+            tab.addEventListener("click", () => {
+                const tool = tab.getAttribute("data-target");
+                const platform = tab.getAttribute("data-platform");
+
+                // find siblings in same tablist
+                const tablist = tab.closest(".tabs");
+                if (tablist) {
+                    const group = Array.from(tablist.querySelectorAll(".tab"));
+                    setTabState(group, tab);
+                }
+                updateInstall(tool, platform);
+            });
+        });
+
+        // Init all tools to mac
+        updateInstall("claude", "mac");
+        updateInstall("codex", "mac");
+        updateInstall("gemini", "mac");
+
+        // Quick year
+        document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+</body>
+
+</html>
