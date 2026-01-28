@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MHcoding - AI 开发者平台</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            /* Light Mode */
+            --bg-primary: #faf9f7;
+            --bg-secondary: #f5f3f0;
+            --bg-tertiary: #edeae5;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --accent-color: #c9a87c;
+            --accent-hover: #b8956a;
+            --highlight-color: #e85a3c;
+            --border-color: rgba(0, 0, 0, 0.06);
+            --logo-line: #c9a87c;
+            --shadow: rgba(0, 0, 0, 0.05);
+            --code-bg: #f5f5f5;
+            --code-border: #e0e0e0;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0d0d0d;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #252525;
+            --text-primary: #f5f5f5;
+            --text-secondary: #a0a0a0;
+            --accent-color: #d4af7a;
+            --accent-hover: #e5c08a;
+            --highlight-color: #ff6b4a;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --logo-line: #d4af7a;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --code-bg: #1e1e1e;
+            --code-border: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: all 0.3s ease;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(20px);
+            background: rgba(var(--bg-primary), 0.8);
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .logo-text span {
+            color: var(--accent-color);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            color: var(--text-secondary);
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .btn-login {
+            padding: 10px 24px;
+            border-radius: 8px;
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-login:hover {
+            opacity: 0.85;
+            transform: translateY(-1px);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 120px 20px 80px;
+            position: relative;
+        }
+
+        /* Geometric Logo with Animation */
+        .logo-container {
+            margin-bottom: 60px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .geometric-logo {
+            width: 560px;
+            height: 640px;
+            position: relative;
+        }
+
+        .geometric-logo svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .logo-line {
+            stroke: var(--logo-line);
+            stroke-width: 2;
+            fill: none;
+            stroke-dasharray: 300;
+            stroke-dashoffset: 300;
+            animation: drawLine 2s ease forwards;
+        }
+
+        .logo-line:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .logo-line:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .logo-line:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .logo-line:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+
+        .logo-line:nth-child(5) {
+            animation-delay: 0.4s;
+        }
+
+        .logo-line:nth-child(6) {
+            animation-delay: 0.5s;
+        }
+
+        .logo-line:nth-child(7) {
+            animation-delay: 0.6s;
+        }
+
+        .logo-line:nth-child(8) {
+            animation-delay: 0.7s;
+        }
+
+        .logo-line:nth-child(9) {
+            animation-delay: 0.8s;
+        }
+
+        .logo-line:nth-child(10) {
+            animation-delay: 0.9s;
+        }
+
+        .logo-line:nth-child(11) {
+            animation-delay: 1.0s;
+        }
+
+        .logo-line:nth-child(12) {
+            animation-delay: 1.1s;
+        }
+
+        @keyframes drawLine {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .logo-container:hover .logo-line {
+            animation: pulse 1.5s ease infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.7;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* Title Animation */
+        .hero-title {
+            font-size: clamp(32px, 5vw, 48px);
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 0.5s forwards;
+        }
+
+        .hero-title .highlight {
+            color: var(--highlight-color);
+            font-weight: 600;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(14px, 2vw, 16px);
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 500px;
+            line-height: 1.8;
+            margin-bottom: 12px;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 0.7s forwards;
+        }
+
+        .hero-price {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            background: linear-gradient(135deg, var(--accent-color), var(--highlight-color));
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 0.9s forwards;
+        }
+
+        .hero-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 50px;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 1.1s forwards;
+        }
+
+        .tag {
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-size: 13px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tag:hover {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Scroll Indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+            cursor: pointer;
+        }
+
+        .scroll-indicator svg {
+            width: 24px;
+            height: 24px;
+            color: var(--text-secondary);
+        }
+
+        @keyframes bounce {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateX(-50%) translateY(0);
+            }
+
+            40% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+
+            60% {
+                transform: translateX(-50%) translateY(-5px);
+            }
+        }
+
+        /* Side Navigation Dots */
+        .side-nav {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .nav-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--border-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot.active {
+            background: var(--highlight-color);
+        }
+
+        .nav-dot:hover {
+            background: var(--accent-color);
+            transform: scale(1.3);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 100px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: clamp(24px, 4vw, 36px);
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 60px;
+            letter-spacing: -0.5px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            padding: 32px;
+            border-radius: 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px var(--shadow);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent-color), var(--highlight-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .feature-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* CLI Setup Section */
+        .cli-setup {
+            padding: 100px 20px;
+            background: var(--bg-secondary);
+        }
+
+        .cli-setup .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .cli-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .cli-card {
+            background: var(--bg-primary);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid var(--border-color);
+        }
+
+        .cli-card-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .cli-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .cli-logo.claude {
+            background: linear-gradient(135deg, #d97706, #f59e0b);
+        }
+
+        .cli-logo.codex {
+            background: linear-gradient(135deg, #10a37f, #34d399);
+        }
+
+        .cli-logo.gemini {
+            background: linear-gradient(135deg, #4285f4, #8ab4f8);
+        }
+
+        .cli-card h3 {
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .cli-card h3 span {
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 400;
+            margin-left: 8px;
+        }
+
+        .cli-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .cli-step {
+            display: flex;
+            gap: 16px;
+        }
+
+        .step-number {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-content h4 {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .step-content p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .code-block {
+            background: var(--code-bg);
+            border: 1px solid var(--code-border);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-block code {
+            color: var(--text-primary);
+            white-space: pre-wrap;
+            display: block;
+            word-break: break-word;
+        }
+
+        .code-block .comment {
+            color: var(--text-secondary);
+        }
+
+        .code-block .string {
+            color: var(--highlight-color);
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        /* Requirements Box */
+        .requirements-box {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+        }
+
+        .requirements-box h4 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .requirements-box ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .requirements-box li {
+            font-size: 14px;
+            color: var(--text-secondary);
+            padding: 4px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .requirements-box li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+        }
+
+        /* Step List */
+        .step-list {
+            list-style: none;
+            margin: 12px 0;
+            padding: 0;
+        }
+
+        .step-list li {
+            font-size: 14px;
+            color: var(--text-secondary);
+            padding: 6px 0 6px 20px;
+            position: relative;
+        }
+
+        .step-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+        }
+
+        .step-list a {
+            color: var(--highlight-color);
+            text-decoration: none;
+        }
+
+        .step-list a:hover {
+            text-decoration: underline;
+        }
+
+        /* Tip Box */
+        .tip-box {
+            background: rgba(201, 168, 124, 0.1);
+            border: 1px solid rgba(201, 168, 124, 0.3);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 12px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .tip-box.warning {
+            background: rgba(232, 90, 60, 0.1);
+            border-color: rgba(232, 90, 60, 0.3);
+        }
+
+        .step-content strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .step-content a {
+            color: var(--highlight-color);
+            text-decoration: none;
+        }
+
+        .step-content a:hover {
+            text-decoration: underline;
+        }
+
+        /* CTA Section */
+        .cta {
+            padding: 100px 20px;
+            text-align: center;
+        }
+
+        .cta h2 {
+            font-size: clamp(24px, 4vw, 32px);
+            font-weight: 500;
+            margin-bottom: 24px;
+        }
+
+        .cta p {
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn-cta {
+            display: inline-block;
+            padding: 14px 32px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--accent-color), var(--highlight-color));
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(232, 90, 60, 0.3);
+        }
+
+        /* Footer */
+        .footer {
+            padding: 40px 20px;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 16px 20px;
+            }
+
+            .side-nav {
+                display: none;
+            }
+
+            .geometric-logo {
+                width: 320px;
+                height: 380px;
+            }
+
+            .cli-card {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <a href="#hero" class="logo-text">MH<span>coding</span></a>
+        <div class="header-actions">
+            <button class="theme-toggle" onclick="toggleTheme()" aria-label="切换主题">
+                <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+            </button>
+            <a href="/login" class="btn-login">登录控制台</a>
+        </div>
+    </header>
+
+    <!-- Side Navigation -->
+    <nav class="side-nav">
+        <div class="nav-dot active" onclick="scrollToSection('hero')"></div>
+        <div class="nav-dot" onclick="scrollToSection('features')"></div>
+        <div class="nav-dot" onclick="scrollToSection('cli-setup')"></div>
+        <div class="nav-dot" onclick="scrollToSection('cta')"></div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="logo-container" onclick="replayLogoAnimation()">
+            <div class="geometric-logo">
+                <svg viewBox="0 0 180 200">
+                    <!-- M Letter -->
+                    <path class="logo-line" d="M30 180 L30 60 L60 120 L90 60 L90 180" />
+                    <path class="logo-line" d="M35 180 L35 65 L62 122 L89 65 L89 180" />
+                    <path class="logo-line" d="M40 180 L40 70 L64 124 L88 70 L88 180" />
+                    <path class="logo-line" d="M25 180 L25 55 L58 118 L91 55 L91 180" />
+                    <!-- H Letter -->
+                    <path class="logo-line" d="M100 180 L100 60" />
+                    <path class="logo-line" d="M100 120 L150 120" />
+                    <path class="logo-line" d="M150 60 L150 180" />
+                    <path class="logo-line" d="M105 180 L105 65" />
+                    <path class="logo-line" d="M105 118 L145 118" />
+                    <path class="logo-line" d="M145 65 L145 180" />
+                    <path class="logo-line" d="M95 180 L95 55" />
+                    <path class="logo-line" d="M155 55 L155 180" />
+                </svg>
+            </div>
+        </div>
+
+        <h1 class="hero-title">欢迎使用 <span class="highlight">MHcoding</span></h1>
+        <p class="hero-subtitle">
+            AI 开发工具统一接入平台<br>
+            整合 Claude、GPT、Gemini 等主流 AI 模型
+        </p>
+        <div class="hero-price">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
+            充值比例 1:1，透明无加价
+        </div>
+        <div class="hero-tags">
+            <span class="tag">Claude Sonnet 4.5</span>
+            <span class="tag">GPT-5.2</span>
+            <span class="tag">Gemini 3 Pro</span>
+            <span class="tag">o3</span>
+            <span class="tag">DeepSeek R1</span>
+        </div>
+
+        <div class="scroll-indicator" onclick="scrollToSection('features')">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <h2 class="section-title">为什么选择 MHcoding</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                    </svg>
+                </div>
+                <h3>统一 API 接口</h3>
+                <p>一套 API 调用所有主流大模型，无需分别对接各家接口，降低开发成本。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 6v6l4 2" />
+                    </svg>
+                </div>
+                <h3>实时响应</h3>
+                <p>全球节点加速，毫秒级响应延迟，支持流式输出，体验原生般顺滑。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                </div>
+                <h3>安全可靠</h3>
+                <p>企业级安全防护，数据加密传输，支持私有化部署，保障业务安全。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+                        <line x1="1" y1="10" x2="23" y2="10" />
+                    </svg>
+                </div>
+                <h3>1:1 充值比例</h3>
+                <p>按量付费，官方原价，无任何加价，支持支付宝直连充值，透明无隐藏费用。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CLI Setup Section -->
+    <section class="cli-setup" id="cli-setup">
+        <div class="container">
+            <h2 class="section-title">AI CLI 工具配置指南</h2>
+
+            <!-- Claude Code -->
+            <div class="cli-cards">
+                <div class="cli-card">
+                    <div class="cli-card-header">
+                        <div class="cli-logo claude">
+                            <svg viewBox="0 0 24 24" width="26" height="26" fill="white">
+                                <path
+                                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
+                            </svg>
+                        </div>
+                        <h3>Claude Code <span>Anthropic 官方 CLI</span></h3>
+                    </div>
+
+                    <!-- 系统要求 -->
+                    <div class="requirements-box">
+                        <h4>📋 系统要求</h4>
+                        <ul>
+                            <li>Windows 10/11 或 macOS 10.15+ 或 Linux</li>
+                            <li>Node.js 18+ (LTS 版本推荐)</li>
+                            <li>网络连接</li>
+                        </ul>
+                    </div>
+
+                    <div class="cli-steps">
+                        <div class="cli-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>安装 Node.js</h4>
+                                <p><strong>方法一：使用官方安装包（推荐）</strong></p>
+                                <ul class="step-list">
+                                    <li>访问 <a href="https://nodejs.org" target="_blank">https://nodejs.org</a></li>
+                                    <li>下载 LTS 版本的安装包</li>
+                                    <li>运行安装程序，按默认设置完成安装</li>
+                                </ul>
+                                <p><strong>方法二：使用包管理器</strong></p>
+                                <div class="code-block">
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    <code><span class="comment"># Windows (使用 Winget)</span>
+winget install OpenJS.NodeJS.LTS
+
+<span class="comment"># macOS (使用 Homebrew)</span>
+brew install node
+
+<span class="comment"># 验证安装</span>
+node --version
+npm --version</code>
+                                </div>
+                                <div class="tip-box">
+                                    💡 建议使用 LTS 版本以获得最佳稳定性。安装完成后需重启命令行窗口。
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cli-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>安装 Claude Code CLI</h4>
+                                <p>打开命令提示符（以管理员身份运行）或终端，执行以下命令：</p>
+                                <div class="code-block">
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    <code>npm install -g @anthropic-ai/claude-code</code>
+                                </div>
+                                <p>验证安装：</p>
+                                <div class="code-block">
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    <code>claude --version</code>
+                                </div>
+                                <div class="tip-box warning">
+                                    ⚠️ 如果遇到权限问题，请确保以管理员身份运行命令提示符。
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cli-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>配置 MHcoding API</h4>
+                                <p><strong>3.1 获取 API Key</strong></p>
+                                <ul class="step-list">
+                                    <li>登录 <a href="/login">MHcoding 控制台</a></li>
+                                    <li>点击「添加令牌」</li>
+                                    <li>令牌名称：随意填写</li>
+                                    <li>复制生成的 API Key</li>
+                                </ul>
+                                <p><strong>3.2 配置方式（推荐使用配置文件，永久生效）</strong></p>
+                                <p>创建配置文件：</p>
+                                <div class="code-block">
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    <code><span class="comment"># Windows 配置文件路径</span>
+%USERPROFILE%\.claude\settings.json
+
+<span class="comment"># macOS/Linux 配置文件路径</span>
+~/.claude/settings.json</code>
+                                </div>
+                                <p>配置文件内容：</p>
+                                <div class="code-block">
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    <code>{
+  <span class="string">"env"</span>: {
+    <span class="string">"ANTHROPIC_AUTH_TOKEN"</span>: <span class="string">"你的API Key"</span>,
+    <span class="string">"ANTHROPIC_BASE_URL"</span>: <span class="string">"https://你的域名"</span>
+  }
+}</code>
+                                </div>
+                                <div class="tip-box">
+                                    💡 配置文件更加安全且便于管理，修改后需要重启 Claude Code 才生效。
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cli-step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>启动 Claude Code</h4>
+                                <p>先进入到项目目录，然后启动：</p>
+                                <div class="code-block">
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    <code>cd your-project-folder
+claude</code>
+                                </div>
+                                <p>首次启动需要完成以下设置：</p>
+                                <ul class="step-list">
+                                    <li>选择喜欢的主题（回车）</li>
+                                    <li>确认安全须知（回车）</li>
+                                    <li>使用默认 Terminal 配置（回车）</li>
+                                    <li>信任工作目录（回车）</li>
+                                    <li>开始编程！🚀</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Codex CLI -->
+                <div class="cli-card">
+                    <div class="cli-card-header">
+                        <div class="cli-logo codex">
+                            <svg viewBox="0 0 24 24" width="26" height="26" fill="white">
+                                <path
+                                    d="M22.28 9.82a5.98 5.98 0 0 0-.52-4.91 6.05 6.05 0 0 0-6.51-2.9A6.07 6.07 0 0 0 4.98 4.18a5.98 5.98 0 0 0-4 2.9 6.05 6.05 0 0 0 .74 7.1 5.98 5.98 0 0 0 .51 4.91 6.05 6.05 0 0 0 6.51 2.9A5.98 5.98 0 0 0 13.26 24a6.06 6.06 0 0 0 5.77-4.21 5.99 5.99 0 0 0 4-2.9 6.06 6.06 0 0 0-.75-7.07zM13.26 22.43a4.48 4.48 0 0 1-2.88-1.04l.14-.08 4.78-2.76a.79.79 0 0 0 .39-.68v-6.74l2.02 1.17a.07.07 0 0 1 .04.05v5.58a4.5 4.5 0 0 1-4.49 4.5zM3.6 18.3a4.47 4.47 0 0 1-.53-3.01l.14.08 4.78 2.76a.77.77 0 0 0 .78 0l5.84-3.37v2.33a.08.08 0 0 1-.03.06l-4.83 2.79a4.5 4.5 0 0 1-6.15-1.64zM2.34 7.9a4.49 4.49 0 0 1 2.37-1.97v5.67a.77.77 0 0 0 .39.68l5.81 3.35-2.02 1.17a.08.08 0 0 1-.07 0L4.01 14a4.5 4.5 0 0 1-1.67-6.1zm16.6 3.86l-5.84-3.37 2.02-1.16a.08.08 0 0 1 .07 0l4.83 2.79a4.49 4.49 0 0 1-.68 8.1v-5.68a.79.79 0 0 0-.4-.68zm2.01-3.02l-.14-.09-4.77-2.78a.78.78 0 0 0-.79 0L9.41 9.23V6.9a.07.07 0 0 1 .03-.06l4.83-2.79a4.5 4.5 0 0 1 6.68 4.66zM8.31 12.86l-2.02-1.16a.08.08 0 0 1-.04-.06V6.07a4.5 4.5 0 0 1 7.38-3.45l-.14.08-4.78 2.76a.79.79 0 0 0-.39.68v6.72zm1.1-2.37l2.6-1.5 2.61 1.5v3l-2.6 1.5-2.61-1.5v-3z" />
+                            </svg>
+                        </div>
+                        <h3>Codex CLI <span>OpenAI 官方 CLI</span></h3>
+                    </div>
+
+                    <!-- 系统要求 -->
+                    <div class="requirements-box">
+                        <h4>📋 系统要求</h4>
+                        <ul>
+                            <li>Windows 10/11 或 macOS 10.15+ 或 Linux</li>
+                            <li>Node.js 22+ (推荐)</li>
+                            <li>Git (可选，用于版本控制)</li>
+                        </ul>
+                    </div>
+
+                    <div class="cli-steps">
+                        <div class="cli-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>安装 Node.js</h4>
+                                <p><strong>方法一：使用官方安装包（推荐）</strong></p>
+                                <ul class="step-list">
+                                    <li>访问 <a href="https://nodejs.org" target="_blank">https://nodejs.org</a></li>
+                                    <li>下载 Node.js 22+ 版本的安装包</li>
+                                    <li>运行安装程序，按默认设置完成安装</li>
+                                </ul>
+                                <p><strong>方法二：使用包管理器</strong></p>
+                                <div class="code-block">
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    <code><span class="comment"># Windows (使用 Winget)</span>
+winget install OpenJS.NodeJS.LTS
+
+<span class="comment"># macOS (使用 Homebrew)</span>
+brew install node
+
+<span class="comment"># 验证安装</span>
+node --version
+npm --version</code>
+                                </div>
+                                <div class="tip-box">
+                                    💡 Codex CLI 需要 Node.js 22+ 版本，请确保安装最新版本。
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cli-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>安装 Codex CLI</h4>
+                                <p>打开命令提示符（以管理员身份运行）或终端，执行以下命令：</p>
+                                <div class="code-block">
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    <code>npm install -g @openai/codex</code>
+                                </div>
+                                <p>验证安装：</p>
+                                <div class="code-block">
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    <code>codex --version</code>
+                                </div>
+                                <div class="tip-box warning">
+                                    ⚠️ 如果遇到权限问题，请确保以管理员身份运行命令提示符。
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cli-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>配置 MHcoding API</h4>
+                                <p><strong>3.1 获取 Codex 专用 API Token</strong></p>
+                                <ul class="step-list">
+                                    <li>登录 <a href="/login">MHcoding 控制台</a></li>
+                                    <li>注册账户或登录现有账户</li>
+                                    <li>进入「API 密钥」页面</li>
+                                    <li>点击「创建新密钥」，选择 <strong>Codex 专用分组</strong></li>
+                                    <li>复制生成的 API Key</li>
+                                </ul>
+                                <div class="tip-box warning">
+                                    ⚠️ 重要：Codex 需要使用专门的分组令牌，与 Claude Code 的令牌不同！
+                                </div>
+                                <p><strong>3.2 创建配置文件夹</strong></p>
+                                <div class="code-block">
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    <code><span class="comment"># Windows</span>
+mkdir %USERPROFILE%\.codex
+cd %USERPROFILE%\.codex
+
+<span class="comment"># macOS/Linux</span>
+mkdir -p ~/.codex
+cd ~/.codex</code>
+                                </div>
+                                <p><strong>3.3 创建配置文件</strong></p>
+                                <p>1. 创建 <code>config.toml</code> 文件：</p>
+                                <div class="code-block">
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    <code>model_provider = <span class="string">"mhcoding"</span>
+model = <span class="string">"gpt-5.2-codex"</span>
+model_reasoning_effort = <span class="string">"xhigh"</span>
+network_access = <span class="string">"enabled"</span>
+disable_response_storage = true
+
+[model_providers.mhcoding]
+name = <span class="string">"mhcoding"</span>
+base_url = <span class="string">"https://你的域名/v1"</span>
+wire_api = <span class="string">"responses"</span>
+requires_openai_auth = true</code>
+                                </div>
+                                <p>2. 创建 <code>auth.json</code> 文件（在同一目录下）：</p>
+                                <div class="code-block">
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    <code>{
+  <span class="string">"OPENAI_API_KEY"</span>: <span class="string">"粘贴你的Codex专用分组令牌key"</span>
+}</code>
+                                </div>
+                                <div class="tip-box">
+                                    💡 配置完成后需要重启 Codex CLI 才生效。
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cli-step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>启动 Codex CLI</h4>
+                                <p>先进入到项目目录，然后启动：</p>
+                                <div class="code-block">
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    <code>cd your-project-folder
+codex</code>
+                                </div>
+                                <p>首次启动需要完成以下设置：</p>
+                                <ul class="step-list">
+                                    <li>选择喜欢的主题（回车）</li>
+                                    <li>确认安全须知（回车）</li>
+                                    <li>信任工作目录（回车）</li>
+                                    <li>开始编程！🚀</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gemini CLI -->
+                <div class="cli-card">
+                    <div class="cli-card-header">
+                        <div class="cli-logo gemini">
+                            <svg viewBox="0 0 24 24" width="26" height="26" fill="white">
+                                <path
+                                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5.5-2.5l7.51-3.49L17.5 6.5 9.99 9.99 6.5 17.5zm5.5-6.6c.61 0 1.1.49 1.1 1.1s-.49 1.1-1.1 1.1-1.1-.49-1.1-1.1.49-1.1 1.1-1.1z" />
+                            </svg>
+                        </div>
+                        <h3>Gemini CLI <span>Google 官方 CLI</span></h3>
+                    </div>
+
+                    <!-- 系统要求 -->
+                    <div class="requirements-box">
+                        <h4>📋 系统要求</h4>
+                        <ul>
+                            <li>Windows 10/11 或 macOS 10.15+ 或 Linux</li>
+                            <li>Node.js 18+</li>
+                            <li>网络连接</li>
+                        </ul>
+                    </div>
+
+                    <div class="cli-steps">
+                        <div class="cli-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>安装 Node.js</h4>
+                                <p><strong>方法一：使用官方安装包（推荐）</strong></p>
+                                <ul class="step-list">
+                                    <li>访问 <a href="https://nodejs.org" target="_blank">https://nodejs.org</a></li>
+                                    <li>下载 LTS 版本的安装包</li>
+                                    <li>运行安装程序，按默认设置完成安装</li>
+                                </ul>
+                                <p><strong>方法二：使用包管理器</strong></p>
+                                <div class="code-block">
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    <code><span class="comment"># Windows (使用 Winget)</span>
+winget install OpenJS.NodeJS.LTS
+
+<span class="comment"># macOS (使用 Homebrew)</span>
+brew install node
+
+<span class="comment"># 验证安装</span>
+node --version
+npm --version</code>
+                                </div>
+                                <div class="tip-box">
+                                    💡 建议使用 LTS 版本以获得最佳稳定性。安装完成后需重启命令行窗口。
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cli-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>安装 Gemini CLI</h4>
+                                <p>打开命令提示符（以管理员身份运行）或终端，执行以下命令：</p>
+                                <div class="code-block">
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    <code>npm install -g @google/gemini-cli</code>
+                                </div>
+                                <p>验证安装：</p>
+                                <div class="code-block">
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    <code>gemini --version</code>
+                                </div>
+                                <div class="tip-box warning">
+                                    ⚠️ 如果遇到权限问题，请确保以管理员身份运行命令提示符。
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cli-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>配置 MHcoding API</h4>
+                                <div class="tip-box warning">
+                                    ⚠️ 重要：请将下方的 GEMINI_API_KEY 替换为您在控制台生成的 <strong>Gemini CLI 专用</strong> API 密钥！
+                                </div>
+                                <p><strong>3.1 创建 .gemini 文件夹</strong></p>
+                                <div class="code-block">
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    <code><span class="comment"># Windows</span>
+mkdir %USERPROFILE%\.gemini
+cd %USERPROFILE%\.gemini
+
+<span class="comment"># macOS/Linux</span>
+mkdir -p ~/.gemini
+cd ~/.gemini</code>
+                                </div>
+                                <p><strong>3.2 创建 .env 文件</strong></p>
+                                <p>在 .gemini 文件夹中创建 <code>.env</code> 文件：</p>
+                                <div class="code-block">
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    <code>GOOGLE_GEMINI_BASE_URL=<span class="string">https://你的域名</span>
+GEMINI_API_KEY=<span class="string">粘贴你的Gemini CLI专用分组令牌key</span>
+GEMINI_MODEL=<span class="string">gemini-3-pro</span></code>
+                                </div>
+                                <p><strong>3.3 创建 settings.json 文件</strong></p>
+                                <p>在 .gemini 文件夹中创建 <code>settings.json</code> 文件：</p>
+                                <div class="code-block">
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    <code>{
+  <span class="string">"ide"</span>: {
+    <span class="string">"enabled"</span>: true
+  },
+  <span class="string">"security"</span>: {
+    <span class="string">"auth"</span>: {
+      <span class="string">"selectedType"</span>: <span class="string">"gemini-api-key"</span>
+    }
+  }
+}</code>
+                                </div>
+                                <div class="tip-box">
+                                    💡 配置文件更加安全且便于管理，需要重启 Gemini CLI 才生效。
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cli-step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>启动 Gemini CLI</h4>
+                                <p>先进入到项目目录，然后启动：</p>
+                                <div class="code-block">
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    <code>cd your-project-folder
+gemini</code>
+                                </div>
+                                <p>首次启动需要完成以下设置：</p>
+                                <ul class="step-list">
+                                    <li>选择喜欢的主题（回车）</li>
+                                    <li>确认安全须知（回车）</li>
+                                    <li>信任工作目录（回车）</li>
+                                    <li>开始编程！🚀</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- CTA Section -->
+    <section class="cta" id="cta">
+        <h2>准备好开始了吗？</h2>
+        <p>立即注册，获取免费体验额度，开启您的 AI 开发之旅。</p>
+        <a href="/register" class="btn-cta">免费注册</a>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© 2025 MHcoding. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Theme Toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('theme-icon');
+            if (theme === 'dark') {
+                icon.innerHTML = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;
+            } else {
+                icon.innerHTML = `
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        `;
+            }
+        }
+
+        // Initialize theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+
+        // Scroll to section
+        function scrollToSection(sectionId) {
+            document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Side navigation dots
+        const sections = document.querySelectorAll('section');
+        const navDots = document.querySelectorAll('.nav-dot');
+
+        window.addEventListener('scroll', () => {
+            let current = 0;
+            sections.forEach((section, index) => {
+                const sectionTop = section.offsetTop;
+                if (window.scrollY >= sectionTop - 300) {
+                    current = index;
+                }
+            });
+
+            navDots.forEach((dot, index) => {
+                dot.classList.remove('active');
+                if (index === current) {
+                    dot.classList.add('active');
+                }
+            });
+        });
+
+        // Replay logo animation
+        function replayLogoAnimation() {
+            const lines = document.querySelectorAll('.logo-line');
+            lines.forEach(line => {
+                line.style.animation = 'none';
+                line.offsetHeight; // trigger reflow
+                line.style.animation = null;
+            });
+        }
+
+        // Copy code
+        function copyCode(btn) {
+            const codeBlock = btn.parentElement.querySelector('code');
+            const text = codeBlock.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = '已复制';
+                setTimeout(() => btn.textContent = '复制', 2000);
+            });
+        }
+    </script>
+</body>
+
+</html>
