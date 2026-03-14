@@ -170,7 +170,7 @@
                     <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
                     <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
                 </button>
-                <a href="/login" class="btn-primary !px-5 !py-2 !text-sm">
+                <a href="/console" class="btn-primary !px-5 !py-2 !text-sm">
                     控制台 <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </a>
             </div>
@@ -226,9 +226,9 @@
                     </div>
                     
                     <h1 class="text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter leading-[1.1] mb-8 drop-shadow-sm">
-                        绝对秩序<br />
+                        极简接入<br />
                         <span class="text-muted">开发者的</span><br />
-                        终极网关
+                        专属网关
                     </h1>
                     
                     <p class="text-lg md:text-xl text-muted max-w-2xl mb-12 leading-relaxed font-medium drop-shadow-sm">
@@ -236,7 +236,7 @@
                     </p>
                     
                     <div class="flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto">
-                        <a href="/register" class="btn-primary text-lg px-8 py-4">
+                        <a href="/console" class="btn-primary text-lg px-8 py-4">
                             获取接入令牌
                         </a>
                         <a href="#cli-setup" class="btn-secondary text-lg px-8 py-4">
@@ -298,8 +298,8 @@
                     </div>
                     <!-- Global Config Copy -->
                     <div class="bg-background border border-border px-4 py-3 flex items-center gap-4 shadow-sm">
-                        <div class="text-sm font-mono text-muted">Endpoint: <span class="text-textMain font-bold">https://api.mhcoding.com</span></div>
-                        <button class="p-1 text-muted hover:text-brand transition-colors" onclick="copyText('https://api.mhcoding.com')" title="复制 API 接口">
+                        <div class="text-sm font-mono text-muted">Endpoint: <span class="text-textMain font-bold">https://www.mhcoding.xyz/</span></div>
+                        <button class="p-1 text-muted hover:text-brand transition-colors" onclick="copyText('https://www.mhcoding.xyz/')" title="复制 API 接口">
                             <i data-lucide="copy" class="w-4 h-4"></i>
                         </button>
                     </div>
@@ -337,7 +337,7 @@
                                     <pre><code class="language-json">{
   "env": {
     "ANTHROPIC_AUTH_TOKEN": "YOUR_API_KEY",
-    "ANTHROPIC_BASE_URL": "https://api.mhcoding.com"
+    "ANTHROPIC_BASE_URL": "https://www.mhcoding.xyz/"
   }
 }</code></pre>
                                 </div>
@@ -384,7 +384,7 @@
                                     </div>
                                     <pre><code class="language-toml">[model_providers.mhcoding]
 name = "mhcoding"
-base_url = "https://api.mhcoding.com/v1"
+base_url = "https://www.mhcoding.xyz/v1"
 wire_api = "responses"
 requires_openai_auth = true</code></pre>
                                 </div>
@@ -429,7 +429,7 @@ requires_openai_auth = true</code></pre>
                                         <span>~/.gemini/.env</span>
                                         <button class="copy-btn" onclick="copyCode(this)"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
                                     </div>
-                                    <pre><code class="language-bash">GOOGLE_GEMINI_BASE_URL=...
+                                    <pre><code class="language-bash">GOOGLE_GEMINI_BASE_URL=https://www.mhcoding.xyz/
 GEMINI_API_KEY=YOUR_KEY
 GEMINI_MODEL=gemini-3-pro</code></pre>
                                 </div>
@@ -471,7 +471,7 @@ GEMINI_MODEL=gemini-3-pro</code></pre>
             <div class="max-w-2xl mx-auto">
                 <h2 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-6">连接未来</h2>
                 <p class="text-lg text-muted mb-10">只需一分钟，为你的终端装备最顶级的 AI 引擎。</p>
-                <a href="/register" class="btn-primary !px-10 !py-4 text-lg">
+                <a href="/console" class="btn-primary !px-10 !py-4 text-lg">
                     获取免费额度
                 </a>
             </div>
