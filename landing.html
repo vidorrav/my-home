@@ -1,1419 +1,580 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" class="dark">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MHcoding - AI 开发者平台</title>
+    <title>MHcoding | Unified AI Infrastructure</title>
+    <meta name="description" content="AI 开发工具统一接入平台，整合 Claude、GPT、Gemini 等主流 AI 模型">
+    
+    <!-- Google Fonts: Inter for UI, JetBrains Mono for Code -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
-        rel="stylesheet">
-    <style>
-        :root {
-            /* Light Mode */
-            --bg-primary: #faf9f7;
-            --bg-secondary: #f5f3f0;
-            --bg-tertiary: #edeae5;
-            --text-primary: #1a1a1a;
-            --text-secondary: #666666;
-            --accent-color: #c9a87c;
-            --accent-hover: #b8956a;
-            --highlight-color: #e85a3c;
-            --border-color: rgba(0, 0, 0, 0.06);
-            --logo-line: #c9a87c;
-            --shadow: rgba(0, 0, 0, 0.05);
-            --code-bg: #f5f5f5;
-            --code-border: #e0e0e0;
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        background: 'var(--background)',
+                        surface: 'var(--surface)',
+                        border: 'var(--border)',
+                        muted: 'var(--muted)',
+                        textMain: 'var(--text-main)',
+                        brand: 'var(--brand-accent)',
+                        brandHover: 'var(--brand-hover)',
+                    },
+                    animation: {
+                        'reveal-up': 'revealUp 0.8s cubic-bezier(0.19, 1, 0.22, 1) forwards',
+                        'draw-logo': 'drawLogo 2.5s cubic-bezier(0.25, 1, 0.5, 1) forwards',
+                        'faint-blink': 'faintBlink 5s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        revealUp: {
+                            '0%': { opacity: 0, transform: 'translateY(30px)' },
+                            '100%': { opacity: 1, transform: 'translateY(0)' },
+                        },
+                        drawLogo: {
+                            '0%': { strokeDashoffset: '200' },
+                            '100%': { strokeDashoffset: '0' },
+                        },
+                        faintBlink: {
+                            '0%, 100%': { opacity: '0.08' },
+                            '50%': { opacity: '0.35' },
+                        }
+                    }
+                }
+            }
         }
+    </script>
 
-        [data-theme="dark"] {
-            --bg-primary: #0d0d0d;
-            --bg-secondary: #1a1a1a;
-            --bg-tertiary: #252525;
-            --text-primary: #f5f5f5;
-            --text-secondary: #a0a0a0;
-            --accent-color: #d4af7a;
-            --accent-hover: #e5c08a;
-            --highlight-color: #ff6b4a;
-            --border-color: rgba(255, 255, 255, 0.08);
-            --logo-line: #d4af7a;
-            --shadow: rgba(0, 0, 0, 0.3);
-            --code-bg: #1e1e1e;
-            --code-border: #333;
-        }
+    <!-- Prism.js for Syntax Highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-toml.min.js"></script>
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            transition: all 0.3s ease;
-            overflow-x: hidden;
-        }
-
-        /* Header */
-        .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 100;
-            padding: 20px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            backdrop-filter: blur(20px);
-            background: rgba(var(--bg-primary), 0.8);
-        }
-
-        .logo-text {
-            font-size: 22px;
-            font-weight: 600;
-            color: var(--text-primary);
-            letter-spacing: -0.5px;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .logo-text span {
-            color: var(--accent-color);
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .theme-toggle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 1px solid var(--border-color);
-            background: transparent;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            color: var(--text-secondary);
-        }
-
-        .theme-toggle:hover {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-        }
-
-        .btn-login {
-            padding: 10px 24px;
-            border-radius: 8px;
-            background: var(--text-primary);
-            color: var(--bg-primary);
-            border: none;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-        }
-
-        .btn-login:hover {
-            opacity: 0.85;
-            transform: translateY(-1px);
-        }
-
-        /* Hero Section */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 120px 20px 80px;
-            position: relative;
-        }
-
-        /* Geometric Logo with Animation */
-        .logo-container {
-            margin-bottom: 60px;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .geometric-logo {
-            width: 560px;
-            height: 640px;
-            position: relative;
-        }
-
-        .geometric-logo svg {
-            width: 100%;
-            height: 100%;
-        }
-
-        .logo-line {
-            stroke: var(--logo-line);
-            stroke-width: 2;
-            fill: none;
-            stroke-dasharray: 300;
-            stroke-dashoffset: 300;
-            animation: drawLine 2s ease forwards;
-        }
-
-        .logo-line:nth-child(1) {
-            animation-delay: 0s;
-        }
-
-        .logo-line:nth-child(2) {
-            animation-delay: 0.1s;
-        }
-
-        .logo-line:nth-child(3) {
-            animation-delay: 0.2s;
-        }
-
-        .logo-line:nth-child(4) {
-            animation-delay: 0.3s;
-        }
-
-        .logo-line:nth-child(5) {
-            animation-delay: 0.4s;
-        }
-
-        .logo-line:nth-child(6) {
-            animation-delay: 0.5s;
-        }
-
-        .logo-line:nth-child(7) {
-            animation-delay: 0.6s;
-        }
-
-        .logo-line:nth-child(8) {
-            animation-delay: 0.7s;
-        }
-
-        .logo-line:nth-child(9) {
-            animation-delay: 0.8s;
-        }
-
-        .logo-line:nth-child(10) {
-            animation-delay: 0.9s;
-        }
-
-        .logo-line:nth-child(11) {
-            animation-delay: 1.0s;
-        }
-
-        .logo-line:nth-child(12) {
-            animation-delay: 1.1s;
-        }
-
-        @keyframes drawLine {
-            to {
-                stroke-dashoffset: 0;
+    <style type="text/tailwindcss">
+        @layer base {
+            /* * 新配色系统: Slate & Sapphire (深空板岩与蓝宝石)
+             * 更冷静、更具科技感的极客美学
+             */
+            :root {
+                --background: #FFFFFF;
+                --surface: #F8FAFC; /* Slate 50 */
+                --border: #E2E8F0; /* Slate 200 */
+                --muted: #64748B; /* Slate 500 */
+                --text-main: #0F172A; /* Slate 900 */
+                --brand-accent: #2563EB; /* Blue 600 */
+                --brand-hover: #1D4ED8; /* Blue 700 */
+            }
+            .dark {
+                --background: #020617; /* Slate 950 */
+                --surface: #0F172A; /* Slate 900 */
+                --border: #1E293B; /* Slate 800 */
+                --muted: #94A3B8; /* Slate 400 */
+                --text-main: #F8FAFC; /* Slate 50 */
+                --brand-accent: #38BDF8; /* Sky 400 */
+                --brand-hover: #0EA5E9; /* Sky 500 */
+            }
+            body {
+                @apply bg-background text-textMain antialiased transition-colors duration-200 selection:bg-brand selection:text-white;
+            }
+            html {
+                scroll-behavior: smooth;
             }
         }
 
-        .logo-container:hover .logo-line {
-            animation: pulse 1.5s ease infinite;
-        }
-
-        @keyframes pulse {
-
-            0%,
-            100% {
-                opacity: 0.7;
+        @layer components {
+            .btn-primary {
+                @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand text-white font-semibold rounded-none min-h-[44px] transition-all duration-200 hover:bg-brandHover active:scale-95 shadow-[4px_4px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_rgba(255,255,255,0.1)] border border-transparent dark:border-white/10;
             }
-
-            50% {
-                opacity: 1;
+            .btn-secondary {
+                @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-surface text-textMain border border-border font-semibold rounded-none min-h-[44px] transition-all duration-200 hover:bg-border active:scale-95;
             }
-        }
-
-        /* Title Animation */
-        .hero-title {
-            font-size: clamp(32px, 5vw, 48px);
-            font-weight: 500;
-            text-align: center;
-            margin-bottom: 20px;
-            letter-spacing: -1px;
-            opacity: 0;
-            animation: fadeInUp 0.8s ease 0.5s forwards;
-        }
-
-        .hero-title .highlight {
-            color: var(--highlight-color);
-            font-weight: 600;
-        }
-
-        .hero-subtitle {
-            font-size: clamp(14px, 2vw, 16px);
-            color: var(--text-secondary);
-            text-align: center;
-            max-width: 500px;
-            line-height: 1.8;
-            margin-bottom: 12px;
-            opacity: 0;
-            animation: fadeInUp 0.8s ease 0.7s forwards;
-        }
-
-        .hero-price {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 20px;
-            background: linear-gradient(135deg, var(--accent-color), var(--highlight-color));
-            color: white;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 20px;
-            opacity: 0;
-            animation: fadeInUp 0.8s ease 0.9s forwards;
-        }
-
-        .hero-tags {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-bottom: 50px;
-            opacity: 0;
-            animation: fadeInUp 0.8s ease 1.1s forwards;
-        }
-
-        .tag {
-            padding: 6px 14px;
-            border-radius: 20px;
-            background: var(--bg-secondary);
-            color: var(--text-secondary);
-            font-size: 13px;
-            border: 1px solid var(--border-color);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .tag:hover {
-            background: var(--accent-color);
-            color: white;
-            border-color: var(--accent-color);
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
+            .grid-divider {
+                @apply border-border;
             }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            /* 终端机代码块样式 */
+            .terminal-window {
+                @apply rounded-none border border-border bg-[#0F172A] text-[#F8FAFC] font-mono text-sm relative mt-4 shadow-sm;
+            }
+            .terminal-header {
+                @apply flex items-center justify-between px-4 py-2 bg-[#1E293B] border-b border-[#334155] text-xs text-[#94A3B8];
+            }
+            .copy-btn {
+                @apply p-1.5 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-brand;
+            }
+            pre[class*="language-"] {
+                @apply !m-0 !p-4 !bg-transparent !text-sm;
             }
         }
 
-        /* Scroll Indicator */
-        .scroll-indicator {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            animation: bounce 2s infinite;
-            cursor: pointer;
+        /* SVG 绘制动画 */
+        .svg-draw-path {
+            stroke-dasharray: 200;
+            stroke-dashoffset: 200;
+            stroke-linecap: square;
+            stroke-linejoin: miter;
         }
 
-        .scroll-indicator svg {
-            width: 24px;
-            height: 24px;
-            color: var(--text-secondary);
-        }
-
-        @keyframes bounce {
-
-            0%,
-            20%,
-            50%,
-            80%,
-            100% {
-                transform: translateX(-50%) translateY(0);
-            }
-
-            40% {
-                transform: translateX(-50%) translateY(-10px);
-            }
-
-            60% {
-                transform: translateX(-50%) translateY(-5px);
-            }
-        }
-
-        /* Side Navigation Dots */
-        .side-nav {
-            position: fixed;
-            right: 30px;
-            top: 50%;
-            transform: translateY(-50%);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            z-index: 100;
-        }
-
-        .nav-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--border-color);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .nav-dot.active {
-            background: var(--highlight-color);
-        }
-
-        .nav-dot:hover {
-            background: var(--accent-color);
-            transform: scale(1.3);
-        }
-
-        /* Features Section */
-        .features {
-            padding: 100px 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .section-title {
-            font-size: clamp(24px, 4vw, 36px);
-            font-weight: 500;
-            text-align: center;
-            margin-bottom: 60px;
-            letter-spacing: -0.5px;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 24px;
-        }
-
-        .feature-card {
-            padding: 32px;
-            border-radius: 16px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px var(--shadow);
-        }
-
-        .feature-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, var(--accent-color), var(--highlight-color));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-            color: white;
-        }
-
-        .feature-card h3 {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        .feature-card p {
-            font-size: 14px;
-            color: var(--text-secondary);
-            line-height: 1.7;
-        }
-
-        /* CLI Setup Section */
-        .cli-setup {
-            padding: 100px 20px;
-            background: var(--bg-secondary);
-        }
-
-        .cli-setup .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .cli-cards {
-            display: flex;
-            flex-direction: column;
-            gap: 40px;
-        }
-
-        .cli-card {
-            background: var(--bg-primary);
-            border-radius: 20px;
-            padding: 40px;
-            border: 1px solid var(--border-color);
-        }
-
-        .cli-card-header {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .cli-logo {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        .cli-logo.claude {
-            background: linear-gradient(135deg, #d97706, #f59e0b);
-        }
-
-        .cli-logo.codex {
-            background: linear-gradient(135deg, #10a37f, #34d399);
-        }
-
-        .cli-logo.gemini {
-            background: linear-gradient(135deg, #4285f4, #8ab4f8);
-        }
-
-        .cli-card h3 {
-            font-size: 22px;
-            font-weight: 600;
-        }
-
-        .cli-card h3 span {
-            color: var(--text-secondary);
-            font-size: 14px;
-            font-weight: 400;
-            margin-left: 8px;
-        }
-
-        .cli-steps {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .cli-step {
-            display: flex;
-            gap: 16px;
-        }
-
-        .step-number {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: var(--accent-color);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: 600;
-            flex-shrink: 0;
-        }
-
-        .step-content {
-            flex: 1;
-        }
-
-        .step-content h4 {
-            font-size: 16px;
-            font-weight: 500;
-            margin-bottom: 8px;
-        }
-
-        .step-content p {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
-        }
-
-        .code-block {
-            background: var(--code-bg);
-            border: 1px solid var(--code-border);
-            border-radius: 8px;
-            padding: 16px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 13px;
-            overflow-x: auto;
-            position: relative;
-        }
-
-        .code-block code {
-            color: var(--text-primary);
-            white-space: pre-wrap;
-            display: block;
-            word-break: break-word;
-        }
-
-        .code-block .comment {
-            color: var(--text-secondary);
-        }
-
-        .code-block .string {
-            color: var(--highlight-color);
-        }
-
-        .copy-btn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            padding: 6px 12px;
-            border-radius: 6px;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            color: var(--text-secondary);
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .copy-btn:hover {
-            background: var(--accent-color);
-            color: white;
-        }
-
-        /* Requirements Box */
-        .requirements-box {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px 24px;
-            margin-bottom: 24px;
-        }
-
-        .requirements-box h4 {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: var(--text-primary);
-        }
-
-        .requirements-box ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        .requirements-box li {
-            font-size: 14px;
-            color: var(--text-secondary);
-            padding: 4px 0;
-            padding-left: 20px;
-            position: relative;
-        }
-
-        .requirements-box li::before {
-            content: "•";
-            position: absolute;
-            left: 0;
-            color: var(--accent-color);
-        }
-
-        /* Step List */
-        .step-list {
-            list-style: none;
-            margin: 12px 0;
-            padding: 0;
-        }
-
-        .step-list li {
-            font-size: 14px;
-            color: var(--text-secondary);
-            padding: 6px 0 6px 20px;
-            position: relative;
-        }
-
-        .step-list li::before {
-            content: "•";
-            position: absolute;
-            left: 0;
-            color: var(--accent-color);
-        }
-
-        .step-list a {
-            color: var(--highlight-color);
-            text-decoration: none;
-        }
-
-        .step-list a:hover {
-            text-decoration: underline;
-        }
-
-        /* Tip Box */
-        .tip-box {
-            background: rgba(201, 168, 124, 0.1);
-            border: 1px solid rgba(201, 168, 124, 0.3);
-            border-radius: 8px;
-            padding: 12px 16px;
-            margin-top: 12px;
-            font-size: 13px;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
-        .tip-box.warning {
-            background: rgba(232, 90, 60, 0.1);
-            border-color: rgba(232, 90, 60, 0.3);
-        }
-
-        .step-content strong {
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-
-        .step-content a {
-            color: var(--highlight-color);
-            text-decoration: none;
-        }
-
-        .step-content a:hover {
-            text-decoration: underline;
-        }
-
-        /* CTA Section */
-        .cta {
-            padding: 100px 20px;
-            text-align: center;
-        }
-
-        .cta h2 {
-            font-size: clamp(24px, 4vw, 32px);
-            font-weight: 500;
-            margin-bottom: 24px;
-        }
-
-        .cta p {
-            color: var(--text-secondary);
-            margin-bottom: 32px;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .btn-cta {
-            display: inline-block;
-            padding: 14px 32px;
-            border-radius: 8px;
-            background: linear-gradient(135deg, var(--accent-color), var(--highlight-color));
-            color: white;
-            font-size: 16px;
-            font-weight: 500;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .btn-cta:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(232, 90, 60, 0.3);
-        }
-
-        /* Footer */
-        .footer {
-            padding: 40px 20px;
-            text-align: center;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .footer p {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .header {
-                padding: 16px 20px;
-            }
-
-            .side-nav {
-                display: none;
-            }
-
-            .geometric-logo {
-                width: 320px;
-                height: 380px;
-            }
-
-            .cli-card {
-                padding: 24px;
-            }
+        /* 背景网格 */
+        .engineering-grid {
+            background-image: 
+                linear-gradient(to right, var(--border) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.3;
         }
     </style>
 </head>
 
-<body>
-    <!-- Header -->
-    <header class="header">
-        <a href="#hero" class="logo-text">MH<span>coding</span></a>
-        <div class="header-actions">
-            <button class="theme-toggle" onclick="toggleTheme()" aria-label="切换主题">
-                <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="5"></circle>
-                    <line x1="12" y1="1" x2="12" y2="3"></line>
-                    <line x1="12" y1="21" x2="12" y2="23"></line>
-                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                    <line x1="1" y1="12" x2="3" y2="12"></line>
-                    <line x1="21" y1="12" x2="23" y2="12"></line>
-                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                </svg>
-            </button>
-            <a href="/login" class="btn-login">登录控制台</a>
+<body class="relative flex flex-col min-h-screen">
+
+    <!-- 全局背景网格 -->
+    <div class="fixed inset-0 pointer-events-none engineering-grid z-[-1]"></div>
+
+    <!-- 导航列 -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md border-b grid-divider">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="#hero" class="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-brand">
+                <div class="w-8 h-8 flex items-center justify-center border-2 border-textMain dark:border-white group-hover:border-brand transition-colors">
+                    <svg viewBox="0 0 100 50" class="w-5 h-5 stroke-textMain dark:stroke-white group-hover:stroke-brand transition-colors" stroke-width="8" fill="none" stroke-linecap="square">
+                        <path d="M10 40 V10 L25 25 L40 10 V40" />
+                        <path d="M60 10 V40 M60 25 H90 M90 10 V40" />
+                    </svg>
+                </div>
+                <span class="font-bold text-lg tracking-tight">MHcoding <span class="text-brand">API</span></span>
+            </a>
+            
+            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-muted">
+                <a href="#features" class="hover:text-textMain transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand">架构特性</a>
+                <a href="#cli-setup" class="hover:text-textMain transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand">部署文档</a>
+                <a href="#cta" class="hover:text-textMain transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand">快速开始</a>
+            </nav>
+
+            <div class="flex items-center gap-4">
+                <button id="themeToggle" class="p-2 text-muted hover:text-textMain transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand" aria-label="切换主题">
+                    <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+                </button>
+                <a href="/login" class="btn-primary !px-5 !py-2 !text-sm">
+                    控制台 <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </a>
+            </div>
         </div>
     </header>
 
-    <!-- Side Navigation -->
-    <nav class="side-nav">
-        <div class="nav-dot active" onclick="scrollToSection('hero')"></div>
-        <div class="nav-dot" onclick="scrollToSection('features')"></div>
-        <div class="nav-dot" onclick="scrollToSection('cli-setup')"></div>
-        <div class="nav-dot" onclick="scrollToSection('cta')"></div>
-    </nav>
+    <!-- 主要内容 -->
+    <main class="flex-grow pt-16">
+        
+        <!-- Hero Section -->
+        <section id="hero" class="min-h-[85vh] flex items-center justify-center relative overflow-hidden border-b grid-divider">
+            
+            <!-- 动态背景容器 -->
+            <div class="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
+                <!-- 工业风背景图 -->
+                <img src="https://picsum.photos/id/249/1920/1080" alt="Industrial Architecture" class="absolute inset-0 w-full h-full object-cover grayscale opacity-20 dark:opacity-30 mix-blend-multiply dark:mix-blend-screen" />
+                
+                <!-- 巨大的 SVG 闪烁 Logo 背景 -->
+                <div class="w-full max-w-[900px] absolute inset-0 m-auto flex items-center justify-center mix-blend-overlay dark:mix-blend-screen animate-faint-blink">
+                    <!-- 定义 Logo 渐变色 -->
+                    <svg class="w-0 h-0 absolute">
+                        <defs>
+                            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#2563EB" />
+                                <stop offset="100%" stop-color="#0EA5E9" />
+                            </linearGradient>
+                            <linearGradient id="logoGradientDark" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#38BDF8" />
+                                <stop offset="100%" stop-color="#818CF8" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
 
-    <!-- Hero Section -->
-    <section class="hero" id="hero">
-        <div class="logo-container" onclick="replayLogoAnimation()">
-            <div class="geometric-logo">
-                <svg viewBox="0 0 180 200">
-                    <!-- M Letter -->
-                    <path class="logo-line" d="M30 180 L30 60 L60 120 L90 60 L90 180" />
-                    <path class="logo-line" d="M35 180 L35 65 L62 122 L89 65 L89 180" />
-                    <path class="logo-line" d="M40 180 L40 70 L64 124 L88 70 L88 180" />
-                    <path class="logo-line" d="M25 180 L25 55 L58 118 L91 55 L91 180" />
-                    <!-- H Letter -->
-                    <path class="logo-line" d="M100 180 L100 60" />
-                    <path class="logo-line" d="M100 120 L150 120" />
-                    <path class="logo-line" d="M150 60 L150 180" />
-                    <path class="logo-line" d="M105 180 L105 65" />
-                    <path class="logo-line" d="M105 118 L145 118" />
-                    <path class="logo-line" d="M145 65 L145 180" />
-                    <path class="logo-line" d="M95 180 L95 55" />
-                    <path class="logo-line" d="M155 55 L155 180" />
+                    <svg viewBox="0 0 100 50" class="w-full h-full stroke-textMain dark:stroke-white" stroke-width="2.5" fill="none" stroke-linecap="square" stroke-linejoin="miter">
+                        <!-- M -->
+                        <path d="M10 40 V10 L25 25 L40 10 V40" class="svg-draw-path animate-draw-logo" />
+                        <!-- H -->
+                        <path d="M60 10 V40 M60 25 H90 M90 10 V40" class="svg-draw-path animate-draw-logo" style="animation-delay: 0.5s;" />
+                        
+                        <!-- 装饰线条 -->
+                        <path d="M0 45 H100" class="stroke-brand svg-draw-path animate-draw-logo" stroke-width="1" style="animation-delay: 1s;" />
+                        <path d="M0 5 H100" class="stroke-border svg-draw-path animate-draw-logo" stroke-width="1" style="animation-delay: 1.2s;" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Hero 文字内容 -->
+            <div class="max-w-7xl mx-auto px-6 w-full flex flex-col items-center justify-center text-center relative z-10 py-20">
+                <div class="opacity-0 animate-reveal-up flex flex-col items-center">
+                    <div class="inline-flex items-center justify-center gap-2 px-3 py-1 mb-8 border border-border bg-surface/80 backdrop-blur text-xs font-bold uppercase tracking-widest text-brand">
+                        <span class="w-2 h-2 bg-brand rounded-none animate-pulse"></span>
+                        Unified Architecture
+                    </div>
+                    
+                    <h1 class="text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter leading-[1.1] mb-8 drop-shadow-sm">
+                        绝对秩序<br />
+                        <span class="text-muted">开发者的</span><br />
+                        终极网关
+                    </h1>
+                    
+                    <p class="text-lg md:text-xl text-muted max-w-2xl mb-12 leading-relaxed font-medium drop-shadow-sm">
+                        抛弃混乱的密钥与账单。一个 MHcoding API Key，工业级接管 Claude Code, Codex 与 Gemini CLI。
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto">
+                        <a href="/register" class="btn-primary text-lg px-8 py-4">
+                            获取接入令牌
+                        </a>
+                        <a href="#cli-setup" class="btn-secondary text-lg px-8 py-4">
+                            查看文档
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 渐变遮罩以确保文字可读性 -->
+            <div class="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent z-0 pointer-events-none"></div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="border-b grid-divider">
+            <div class="max-w-7xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+                    
+                    <!-- Feature 1 -->
+                    <div class="p-10 border-b lg:border-b-0 lg:border-r grid-divider hover:bg-surface transition-colors group">
+                        <i data-lucide="binary" class="w-8 h-8 mb-6 text-brand"></i>
+                        <h3 class="text-xl font-bold tracking-tight mb-3">统一协议</h3>
+                        <p class="text-sm text-muted leading-relaxed">彻底消除多平台对接成本。使用统一标准端点，无缝向下分发至各个大模型原生 CLI 工具。</p>
+                    </div>
+                    
+                    <!-- Feature 2 -->
+                    <div class="p-10 border-b lg:border-b-0 lg:border-r grid-divider hover:bg-surface transition-colors group">
+                        <i data-lucide="zap" class="w-8 h-8 mb-6 text-brand"></i>
+                        <h3 class="text-xl font-bold tracking-tight mb-3">毫秒级调度</h3>
+                        <p class="text-sm text-muted leading-relaxed">构建在边缘计算节点之上，提供原生级别的流式输出体验，不增加任何感知延迟。</p>
+                    </div>
+                    
+                    <!-- Feature 3 -->
+                    <div class="p-10 border-b md:border-b-0 lg:border-r grid-divider hover:bg-surface transition-colors group">
+                        <i data-lucide="lock" class="w-8 h-8 mb-6 text-brand"></i>
+                        <h3 class="text-xl font-bold tracking-tight mb-3">企业级加密</h3>
+                        <p class="text-sm text-muted leading-relaxed">密钥及请求数据全程采用端到端加密，不在中转层留存任何用户代码或提问数据。</p>
+                    </div>
+                    
+                    <!-- Feature 4 -->
+                    <div class="p-10 hover:bg-surface transition-colors group">
+                        <i data-lucide="scale" class="w-8 h-8 mb-6 text-brand"></i>
+                        <h3 class="text-xl font-bold tracking-tight mb-3">1:1 公平计费</h3>
+                        <p class="text-sm text-muted leading-relaxed">采用按量付费模式，严格对标官方汇率与定价模型，拒绝任何隐藏的 token 溢价。</p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- CLI Setup Documentation Section -->
+        <section id="cli-setup" class="py-24 bg-surface/50 border-b grid-divider">
+            <div class="max-w-7xl mx-auto px-6">
+                
+                <div class="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <div>
+                        <h2 class="text-4xl font-extrabold tracking-tight mb-4">部署文档</h2>
+                        <p class="text-lg text-muted">标准化的三步配置，接管你的终端编程体验。</p>
+                    </div>
+                    <!-- Global Config Copy -->
+                    <div class="bg-background border border-border px-4 py-3 flex items-center gap-4 shadow-sm">
+                        <div class="text-sm font-mono text-muted">Endpoint: <span class="text-textMain font-bold">https://api.mhcoding.com</span></div>
+                        <button class="p-1 text-muted hover:text-brand transition-colors" onclick="copyText('https://api.mhcoding.com')" title="复制 API 接口">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    
+                    <!-- Claude Code -->
+                    <div class="bg-background border border-border flex flex-col">
+                        <div class="p-6 border-b grid-divider flex items-center gap-4">
+                            <div class="w-10 h-10 bg-[#0F172A] border border-[#1E293B] flex items-center justify-center text-white font-bold">C</div>
+                            <div>
+                                <h3 class="font-bold text-lg leading-tight">Claude Code</h3>
+                                <p class="text-xs text-muted">Anthropic 官方客户端</p>
+                            </div>
+                        </div>
+                        <div class="p-6 flex-1 flex flex-col gap-6">
+                            <div>
+                                <h4 class="text-sm font-bold flex items-center gap-2 mb-2"><span class="text-brand">01</span> 安装</h4>
+                                <div class="terminal-window">
+                                    <div class="terminal-header">
+                                        <span>Terminal</span>
+                                        <button class="copy-btn" onclick="copyCode(this)"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
+                                    </div>
+                                    <pre><code class="language-bash">npm install -g @anthropic-ai/claude-code</code></pre>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold flex items-center gap-2 mb-2"><span class="text-brand">02</span> 配置 (settings.json)</h4>
+                                <div class="terminal-window">
+                                    <div class="terminal-header">
+                                        <span>~/.claude/settings.json</span>
+                                        <button class="copy-btn" onclick="copyCode(this)"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
+                                    </div>
+                                    <pre><code class="language-json">{
+  "env": {
+    "ANTHROPIC_AUTH_TOKEN": "YOUR_API_KEY",
+    "ANTHROPIC_BASE_URL": "https://api.mhcoding.com"
+  }
+}</code></pre>
+                                </div>
+                            </div>
+                            <div class="mt-auto pt-4">
+                                <h4 class="text-sm font-bold flex items-center gap-2 mb-2"><span class="text-brand">03</span> 启动</h4>
+                                <div class="terminal-window">
+                                    <pre><code class="language-bash">claude</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Codex CLI -->
+                    <div class="bg-background border border-border flex flex-col">
+                        <div class="p-6 border-b grid-divider flex items-center gap-4 relative overflow-hidden">
+                            <div class="absolute inset-0 engineering-grid opacity-50 pointer-events-none"></div>
+                            <div class="w-10 h-10 bg-[#0F172A] border border-[#1E293B] flex items-center justify-center text-white font-bold relative z-10">O</div>
+                            <div class="relative z-10">
+                                <h3 class="font-bold text-lg leading-tight">Codex CLI</h3>
+                                <p class="text-xs text-muted">OpenAI 官方客户端</p>
+                            </div>
+                        </div>
+                        <div class="p-6 flex-1 flex flex-col gap-6">
+                            <div class="bg-surface border-l-4 border-brand p-3 text-xs text-textMain font-medium">
+                                注意：Codex 需要使用 Node 22+ 及特定的专属 API Key。
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold flex items-center gap-2 mb-2"><span class="text-brand">01</span> 安装</h4>
+                                <div class="terminal-window">
+                                    <div class="terminal-header">
+                                        <span>Terminal</span>
+                                        <button class="copy-btn" onclick="copyCode(this)"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
+                                    </div>
+                                    <pre><code class="language-bash">npm install -g @openai/codex</code></pre>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold flex items-center gap-2 mb-2"><span class="text-brand">02</span> 配置 (config.toml)</h4>
+                                <div class="terminal-window">
+                                    <div class="terminal-header">
+                                        <span>~/.codex/config.toml</span>
+                                        <button class="copy-btn" onclick="copyCode(this)"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
+                                    </div>
+                                    <pre><code class="language-toml">[model_providers.mhcoding]
+name = "mhcoding"
+base_url = "https://api.mhcoding.com/v1"
+wire_api = "responses"
+requires_openai_auth = true</code></pre>
+                                </div>
+                            </div>
+                            <div class="mt-auto pt-4">
+                                <h4 class="text-sm font-bold flex items-center gap-2 mb-2"><span class="text-brand">03</span> 凭证 (auth.json)</h4>
+                                <div class="terminal-window">
+                                    <div class="terminal-header">
+                                        <span>~/.codex/auth.json</span>
+                                        <button class="copy-btn" onclick="copyCode(this)"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
+                                    </div>
+                                    <pre><code class="language-json">{ "OPENAI_API_KEY": "YOUR_KEY" }</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gemini CLI -->
+                    <div class="bg-background border border-border flex flex-col">
+                        <div class="p-6 border-b grid-divider flex items-center gap-4">
+                            <div class="w-10 h-10 bg-[#0F172A] border border-[#1E293B] flex items-center justify-center text-white font-bold">G</div>
+                            <div>
+                                <h3 class="font-bold text-lg leading-tight">Gemini CLI</h3>
+                                <p class="text-xs text-muted">Google 官方客户端</p>
+                            </div>
+                        </div>
+                        <div class="p-6 flex-1 flex flex-col gap-6">
+                            <div>
+                                <h4 class="text-sm font-bold flex items-center gap-2 mb-2"><span class="text-brand">01</span> 安装</h4>
+                                <div class="terminal-window">
+                                    <div class="terminal-header">
+                                        <span>Terminal</span>
+                                        <button class="copy-btn" onclick="copyCode(this)"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
+                                    </div>
+                                    <pre><code class="language-bash">npm install -g @google/gemini-cli</code></pre>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold flex items-center gap-2 mb-2"><span class="text-brand">02</span> 环境 (.env)</h4>
+                                <div class="terminal-window">
+                                    <div class="terminal-header">
+                                        <span>~/.gemini/.env</span>
+                                        <button class="copy-btn" onclick="copyCode(this)"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
+                                    </div>
+                                    <pre><code class="language-bash">GOOGLE_GEMINI_BASE_URL=...
+GEMINI_API_KEY=YOUR_KEY
+GEMINI_MODEL=gemini-3-pro</code></pre>
+                                </div>
+                            </div>
+                            <div class="mt-auto pt-4">
+                                <h4 class="text-sm font-bold flex items-center gap-2 mb-2"><span class="text-brand">03</span> 启动 (settings.json)</h4>
+                                <div class="terminal-window">
+                                    <div class="terminal-header">
+                                        <span>~/.gemini/settings.json</span>
+                                        <button class="copy-btn" onclick="copyCode(this)"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
+                                    </div>
+                                    <pre><code class="language-json">{
+  "security": {
+    "auth": { "selectedType": "gemini-api-key" }
+  }
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Image Break / Inspiration Section -->
+        <section class="border-b grid-divider relative h-64 md:h-96 overflow-hidden flex items-center justify-center">
+            <div class="absolute inset-0 bg-black z-10 opacity-40 dark:opacity-60 mix-blend-multiply"></div>
+            <img src="https://picsum.photos/id/0/1920/600" alt="Developer Workspace" class="absolute inset-0 w-full h-full object-cover grayscale" />
+            
+            <div class="relative z-20 text-center px-6">
+                <blockquote class="text-2xl md:text-4xl font-bold text-white tracking-tight mb-4">"Less, but better."</blockquote>
+                <p class="text-sm text-gray-300 tracking-widest uppercase">— Dieter Rams</p>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section id="cta" class="py-32 bg-background text-center px-6">
+            <div class="max-w-2xl mx-auto">
+                <h2 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-6">连接未来</h2>
+                <p class="text-lg text-muted mb-10">只需一分钟，为你的终端装备最顶级的 AI 引擎。</p>
+                <a href="/register" class="btn-primary !px-10 !py-4 text-lg">
+                    获取免费额度
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Minimalist Footer -->
+    <footer class="border-t grid-divider bg-surface py-12 px-6">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-3">
+                <svg viewBox="0 0 100 50" class="w-6 h-6 stroke-textMain dark:stroke-white" stroke-width="6" fill="none" stroke-linecap="square">
+                    <path d="M10 40 V10 L25 25 L40 10 V40" />
+                    <path d="M60 10 V40 M60 25 H90 M90 10 V40" />
                 </svg>
+                <span class="font-bold tracking-tight text-sm">MHcoding API</span>
+            </div>
+            
+            <div class="text-sm text-muted">
+                &copy; <span id="year"></span> MHcoding Infrastructure. Built for developers.
             </div>
         </div>
-
-        <h1 class="hero-title">欢迎使用 <span class="highlight">MHcoding</span></h1>
-        <p class="hero-subtitle">
-            AI 开发工具统一接入平台<br>
-            整合 Claude、GPT、Gemini 等主流 AI 模型
-        </p>
-        <div class="hero-price">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2">
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-            </svg>
-            充值比例 1:1，透明无加价
-        </div>
-        <div class="hero-tags">
-            <span class="tag">Claude Sonnet 4.5</span>
-            <span class="tag">GPT-5.2</span>
-            <span class="tag">Gemini 3 Pro</span>
-            <span class="tag">o3</span>
-            <span class="tag">DeepSeek R1</span>
-        </div>
-
-        <div class="scroll-indicator" onclick="scrollToSection('features')">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="features" id="features">
-        <h2 class="section-title">为什么选择 MHcoding</h2>
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2">
-                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                    </svg>
-                </div>
-                <h3>统一 API 接口</h3>
-                <p>一套 API 调用所有主流大模型，无需分别对接各家接口，降低开发成本。</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10" />
-                        <path d="M12 6v6l4 2" />
-                    </svg>
-                </div>
-                <h3>实时响应</h3>
-                <p>全球节点加速，毫秒级响应延迟，支持流式输出，体验原生般顺滑。</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                    </svg>
-                </div>
-                <h3>安全可靠</h3>
-                <p>企业级安全防护，数据加密传输，支持私有化部署，保障业务安全。</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2">
-                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
-                        <line x1="1" y1="10" x2="23" y2="10" />
-                    </svg>
-                </div>
-                <h3>1:1 充值比例</h3>
-                <p>按量付费，官方原价，无任何加价，支持支付宝直连充值，透明无隐藏费用。</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- CLI Setup Section -->
-    <section class="cli-setup" id="cli-setup">
-        <div class="container">
-            <h2 class="section-title">AI CLI 工具配置指南</h2>
-
-            <!-- Claude Code -->
-            <div class="cli-cards">
-                <div class="cli-card">
-                    <div class="cli-card-header">
-                        <div class="cli-logo claude">
-                            <svg viewBox="0 0 24 24" width="26" height="26" fill="white">
-                                <path
-                                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
-                            </svg>
-                        </div>
-                        <h3>Claude Code <span>Anthropic 官方 CLI</span></h3>
-                    </div>
-
-                    <!-- 系统要求 -->
-                    <div class="requirements-box">
-                        <h4>📋 系统要求</h4>
-                        <ul>
-                            <li>Windows 10/11 或 macOS 10.15+ 或 Linux</li>
-                            <li>Node.js 18+ (LTS 版本推荐)</li>
-                            <li>网络连接</li>
-                        </ul>
-                    </div>
-
-                    <div class="cli-steps">
-                        <div class="cli-step">
-                            <div class="step-number">1</div>
-                            <div class="step-content">
-                                <h4>安装 Node.js</h4>
-                                <p><strong>方法一：使用官方安装包（推荐）</strong></p>
-                                <ul class="step-list">
-                                    <li>访问 <a href="https://nodejs.org" target="_blank">https://nodejs.org</a></li>
-                                    <li>下载 LTS 版本的安装包</li>
-                                    <li>运行安装程序，按默认设置完成安装</li>
-                                </ul>
-                                <p><strong>方法二：使用包管理器</strong></p>
-                                <div class="code-block">
-                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                                    <code><span class="comment"># Windows (使用 Winget)</span>
-winget install OpenJS.NodeJS.LTS
-
-<span class="comment"># macOS (使用 Homebrew)</span>
-brew install node
-
-<span class="comment"># 验证安装</span>
-node --version
-npm --version</code>
-                                </div>
-                                <div class="tip-box">
-                                    💡 建议使用 LTS 版本以获得最佳稳定性。安装完成后需重启命令行窗口。
-                                </div>
-                            </div>
-                        </div>
-                        <div class="cli-step">
-                            <div class="step-number">2</div>
-                            <div class="step-content">
-                                <h4>安装 Claude Code CLI</h4>
-                                <p>打开命令提示符（以管理员身份运行）或终端，执行以下命令：</p>
-                                <div class="code-block">
-                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                                    <code>npm install -g @anthropic-ai/claude-code</code>
-                                </div>
-                                <p>验证安装：</p>
-                                <div class="code-block">
-                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                                    <code>claude --version</code>
-                                </div>
-                                <div class="tip-box warning">
-                                    ⚠️ 如果遇到权限问题，请确保以管理员身份运行命令提示符。
-                                </div>
-                            </div>
-                        </div>
-                        <div class="cli-step">
-                            <div class="step-number">3</div>
-                            <div class="step-content">
-                                <h4>配置 MHcoding API</h4>
-                                <p><strong>3.1 获取 API Key</strong></p>
-                                <ul class="step-list">
-                                    <li>登录 <a href="/login">MHcoding 控制台</a></li>
-                                    <li>点击「添加令牌」</li>
-                                    <li>令牌名称：随意填写</li>
-                                    <li>复制生成的 API Key</li>
-                                </ul>
-                                <p><strong>3.2 配置方式（推荐使用配置文件，永久生效）</strong></p>
-                                <p>创建配置文件：</p>
-                                <div class="code-block">
-                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                                    <code><span class="comment"># Windows 配置文件路径</span>
-%USERPROFILE%\.claude\settings.json
-
-<span class="comment"># macOS/Linux 配置文件路径</span>
-~/.claude/settings.json</code>
-                                </div>
-                                <p>配置文件内容：</p>
-                                <div class="code-block">
-                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                                    <code>{
-  <span class="string">"env"</span>: {
-    <span class="string">"ANTHROPIC_AUTH_TOKEN"</span>: <span class="string">"你的API Key"</span>,
-    <span class="string">"ANTHROPIC_BASE_URL"</span>: <span class="string">"https://你的域名"</span>
-  }
-}</code>
-                                </div>
-                                <div class="tip-box">
-                                    💡 配置文件更加安全且便于管理，修改后需要重启 Claude Code 才生效。
-                                </div>
-                            </div>
-                        </div>
-                        <div class="cli-step">
-                            <div class="step-number">4</div>
-                            <div class="step-content">
-                                <h4>启动 Claude Code</h4>
-                                <p>先进入到项目目录，然后启动：</p>
-                                <div class="code-block">
-                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                                    <code>cd your-project-folder
-claude</code>
-                                </div>
-                                <p>首次启动需要完成以下设置：</p>
-                                <ul class="step-list">
-                                    <li>选择喜欢的主题（回车）</li>
-                                    <li>确认安全须知（回车）</li>
-                                    <li>使用默认 Terminal 配置（回车）</li>
-                                    <li>信任工作目录（回车）</li>
-                                    <li>开始编程！🚀</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Codex CLI -->
-                <div class="cli-card">
-                    <div class="cli-card-header">
-                        <div class="cli-logo codex">
-                            <svg viewBox="0 0 24 24" width="26" height="26" fill="white">
-                                <path
-                                    d="M22.28 9.82a5.98 5.98 0 0 0-.52-4.91 6.05 6.05 0 0 0-6.51-2.9A6.07 6.07 0 0 0 4.98 4.18a5.98 5.98 0 0 0-4 2.9 6.05 6.05 0 0 0 .74 7.1 5.98 5.98 0 0 0 .51 4.91 6.05 6.05 0 0 0 6.51 2.9A5.98 5.98 0 0 0 13.26 24a6.06 6.06 0 0 0 5.77-4.21 5.99 5.99 0 0 0 4-2.9 6.06 6.06 0 0 0-.75-7.07zM13.26 22.43a4.48 4.48 0 0 1-2.88-1.04l.14-.08 4.78-2.76a.79.79 0 0 0 .39-.68v-6.74l2.02 1.17a.07.07 0 0 1 .04.05v5.58a4.5 4.5 0 0 1-4.49 4.5zM3.6 18.3a4.47 4.47 0 0 1-.53-3.01l.14.08 4.78 2.76a.77.77 0 0 0 .78 0l5.84-3.37v2.33a.08.08 0 0 1-.03.06l-4.83 2.79a4.5 4.5 0 0 1-6.15-1.64zM2.34 7.9a4.49 4.49 0 0 1 2.37-1.97v5.67a.77.77 0 0 0 .39.68l5.81 3.35-2.02 1.17a.08.08 0 0 1-.07 0L4.01 14a4.5 4.5 0 0 1-1.67-6.1zm16.6 3.86l-5.84-3.37 2.02-1.16a.08.08 0 0 1 .07 0l4.83 2.79a4.49 4.49 0 0 1-.68 8.1v-5.68a.79.79 0 0 0-.4-.68zm2.01-3.02l-.14-.09-4.77-2.78a.78.78 0 0 0-.79 0L9.41 9.23V6.9a.07.07 0 0 1 .03-.06l4.83-2.79a4.5 4.5 0 0 1 6.68 4.66zM8.31 12.86l-2.02-1.16a.08.08 0 0 1-.04-.06V6.07a4.5 4.5 0 0 1 7.38-3.45l-.14.08-4.78 2.76a.79.79 0 0 0-.39.68v6.72zm1.1-2.37l2.6-1.5 2.61 1.5v3l-2.6 1.5-2.61-1.5v-3z" />
-                            </svg>
-                        </div>
-                        <h3>Codex CLI <span>OpenAI 官方 CLI</span></h3>
-                    </div>
-
-                    <!-- 系统要求 -->
-                    <div class="requirements-box">
-                        <h4>📋 系统要求</h4>
-                        <ul>
-                            <li>Windows 10/11 或 macOS 10.15+ 或 Linux</li>
-                            <li>Node.js 22+ (推荐)</li>
-                            <li>Git (可选，用于版本控制)</li>
-                        </ul>
-                    </div>
-
-                    <div class="cli-steps">
-                        <div class="cli-step">
-                            <div class="step-number">1</div>
-                            <div class="step-content">
-                                <h4>安装 Node.js</h4>
-                                <p><strong>方法一：使用官方安装包（推荐）</strong></p>
-                                <ul class="step-list">
-                                    <li>访问 <a href="https://nodejs.org" target="_blank">https://nodejs.org</a></li>
-                                    <li>下载 Node.js 22+ 版本的安装包</li>
-                                    <li>运行安装程序，按默认设置完成安装</li>
-                                </ul>
-                                <p><strong>方法二：使用包管理器</strong></p>
-                                <div class="code-block">
-                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                                    <code><span class="comment"># Windows (使用 Winget)</span>
-winget install OpenJS.NodeJS.LTS
-
-<span class="comment"># macOS (使用 Homebrew)</span>
-brew install node
-
-<span class="comment"># 验证安装</span>
-node --version
-npm --version</code>
-                                </div>
-                                <div class="tip-box">
-                                    💡 Codex CLI 需要 Node.js 22+ 版本，请确保安装最新版本。
-                                </div>
-                            </div>
-                        </div>
-                        <div class="cli-step">
-                            <div class="step-number">2</div>
-                            <div class="step-content">
-                                <h4>安装 Codex CLI</h4>
-                                <p>打开命令提示符（以管理员身份运行）或终端，执行以下命令：</p>
-                                <div class="code-block">
-                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                                    <code>npm install -g @openai/codex</code>
-                                </div>
-                                <p>验证安装：</p>
-                                <div class="code-block">
-                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                                    <code>codex --version</code>
-                                </div>
-                                <div class="tip-box warning">
-                                    ⚠️ 如果遇到权限问题，请确保以管理员身份运行命令提示符。
-                                </div>
-                            </div>
-                        </div>
-                        <div class="cli-step">
-                            <div class="step-number">3</div>
-                            <div class="step-content">
-                                <h4>配置 MHcoding API</h4>
-                                <p><strong>3.1 获取 Codex 专用 API Token</strong></p>
-                                <ul class="step-list">
-                                    <li>登录 <a href="/login">MHcoding 控制台</a></li>
-                                    <li>注册账户或登录现有账户</li>
-                                    <li>进入「API 密钥」页面</li>
-                                    <li>点击「创建新密钥」，选择 <strong>Codex 专用分组</strong></li>
-                                    <li>复制生成的 API Key</li>
-                                </ul>
-                                <div class="tip-box warning">
-                                    ⚠️ 重要：Codex 需要使用专门的分组令牌，与 Claude Code 的令牌不同！
-                                </div>
-                                <p><strong>3.2 创建配置文件夹</strong></p>
-                                <div class="code-block">
-                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                                    <code><span class="comment"># Windows</span>
-mkdir %USERPROFILE%\.codex
-cd %USERPROFILE%\.codex
-
-<span class="comment"># macOS/Linux</span>
-mkdir -p ~/.codex
-cd ~/.codex</code>
-                                </div>
-                                <p><strong>3.3 创建配置文件</strong></p>
-                                <p>1. 创建 <code>config.toml</code> 文件：</p>
-                                <div class="code-block">
-                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                                    <code>model_provider = <span class="string">"mhcoding"</span>
-model = <span class="string">"gpt-5.2-codex"</span>
-model_reasoning_effort = <span class="string">"xhigh"</span>
-network_access = <span class="string">"enabled"</span>
-disable_response_storage = true
-
-[model_providers.mhcoding]
-name = <span class="string">"mhcoding"</span>
-base_url = <span class="string">"https://你的域名/v1"</span>
-wire_api = <span class="string">"responses"</span>
-requires_openai_auth = true</code>
-                                </div>
-                                <p>2. 创建 <code>auth.json</code> 文件（在同一目录下）：</p>
-                                <div class="code-block">
-                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                                    <code>{
-  <span class="string">"OPENAI_API_KEY"</span>: <span class="string">"粘贴你的Codex专用分组令牌key"</span>
-}</code>
-                                </div>
-                                <div class="tip-box">
-                                    💡 配置完成后需要重启 Codex CLI 才生效。
-                                </div>
-                            </div>
-                        </div>
-                        <div class="cli-step">
-                            <div class="step-number">4</div>
-                            <div class="step-content">
-                                <h4>启动 Codex CLI</h4>
-                                <p>先进入到项目目录，然后启动：</p>
-                                <div class="code-block">
-                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                                    <code>cd your-project-folder
-codex</code>
-                                </div>
-                                <p>首次启动需要完成以下设置：</p>
-                                <ul class="step-list">
-                                    <li>选择喜欢的主题（回车）</li>
-                                    <li>确认安全须知（回车）</li>
-                                    <li>信任工作目录（回车）</li>
-                                    <li>开始编程！🚀</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Gemini CLI -->
-                <div class="cli-card">
-                    <div class="cli-card-header">
-                        <div class="cli-logo gemini">
-                            <svg viewBox="0 0 24 24" width="26" height="26" fill="white">
-                                <path
-                                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5.5-2.5l7.51-3.49L17.5 6.5 9.99 9.99 6.5 17.5zm5.5-6.6c.61 0 1.1.49 1.1 1.1s-.49 1.1-1.1 1.1-1.1-.49-1.1-1.1.49-1.1 1.1-1.1z" />
-                            </svg>
-                        </div>
-                        <h3>Gemini CLI <span>Google 官方 CLI</span></h3>
-                    </div>
-
-                    <!-- 系统要求 -->
-                    <div class="requirements-box">
-                        <h4>📋 系统要求</h4>
-                        <ul>
-                            <li>Windows 10/11 或 macOS 10.15+ 或 Linux</li>
-                            <li>Node.js 18+</li>
-                            <li>网络连接</li>
-                        </ul>
-                    </div>
-
-                    <div class="cli-steps">
-                        <div class="cli-step">
-                            <div class="step-number">1</div>
-                            <div class="step-content">
-                                <h4>安装 Node.js</h4>
-                                <p><strong>方法一：使用官方安装包（推荐）</strong></p>
-                                <ul class="step-list">
-                                    <li>访问 <a href="https://nodejs.org" target="_blank">https://nodejs.org</a></li>
-                                    <li>下载 LTS 版本的安装包</li>
-                                    <li>运行安装程序，按默认设置完成安装</li>
-                                </ul>
-                                <p><strong>方法二：使用包管理器</strong></p>
-                                <div class="code-block">
-                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                                    <code><span class="comment"># Windows (使用 Winget)</span>
-winget install OpenJS.NodeJS.LTS
-
-<span class="comment"># macOS (使用 Homebrew)</span>
-brew install node
-
-<span class="comment"># 验证安装</span>
-node --version
-npm --version</code>
-                                </div>
-                                <div class="tip-box">
-                                    💡 建议使用 LTS 版本以获得最佳稳定性。安装完成后需重启命令行窗口。
-                                </div>
-                            </div>
-                        </div>
-                        <div class="cli-step">
-                            <div class="step-number">2</div>
-                            <div class="step-content">
-                                <h4>安装 Gemini CLI</h4>
-                                <p>打开命令提示符（以管理员身份运行）或终端，执行以下命令：</p>
-                                <div class="code-block">
-                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                                    <code>npm install -g @google/gemini-cli</code>
-                                </div>
-                                <p>验证安装：</p>
-                                <div class="code-block">
-                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                                    <code>gemini --version</code>
-                                </div>
-                                <div class="tip-box warning">
-                                    ⚠️ 如果遇到权限问题，请确保以管理员身份运行命令提示符。
-                                </div>
-                            </div>
-                        </div>
-                        <div class="cli-step">
-                            <div class="step-number">3</div>
-                            <div class="step-content">
-                                <h4>配置 MHcoding API</h4>
-                                <div class="tip-box warning">
-                                    ⚠️ 重要：请将下方的 GEMINI_API_KEY 替换为您在控制台生成的 <strong>Gemini CLI 专用</strong> API 密钥！
-                                </div>
-                                <p><strong>3.1 创建 .gemini 文件夹</strong></p>
-                                <div class="code-block">
-                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                                    <code><span class="comment"># Windows</span>
-mkdir %USERPROFILE%\.gemini
-cd %USERPROFILE%\.gemini
-
-<span class="comment"># macOS/Linux</span>
-mkdir -p ~/.gemini
-cd ~/.gemini</code>
-                                </div>
-                                <p><strong>3.2 创建 .env 文件</strong></p>
-                                <p>在 .gemini 文件夹中创建 <code>.env</code> 文件：</p>
-                                <div class="code-block">
-                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                                    <code>GOOGLE_GEMINI_BASE_URL=<span class="string">https://你的域名</span>
-GEMINI_API_KEY=<span class="string">粘贴你的Gemini CLI专用分组令牌key</span>
-GEMINI_MODEL=<span class="string">gemini-3-pro</span></code>
-                                </div>
-                                <p><strong>3.3 创建 settings.json 文件</strong></p>
-                                <p>在 .gemini 文件夹中创建 <code>settings.json</code> 文件：</p>
-                                <div class="code-block">
-                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                                    <code>{
-  <span class="string">"ide"</span>: {
-    <span class="string">"enabled"</span>: true
-  },
-  <span class="string">"security"</span>: {
-    <span class="string">"auth"</span>: {
-      <span class="string">"selectedType"</span>: <span class="string">"gemini-api-key"</span>
-    }
-  }
-}</code>
-                                </div>
-                                <div class="tip-box">
-                                    💡 配置文件更加安全且便于管理，需要重启 Gemini CLI 才生效。
-                                </div>
-                            </div>
-                        </div>
-                        <div class="cli-step">
-                            <div class="step-number">4</div>
-                            <div class="step-content">
-                                <h4>启动 Gemini CLI</h4>
-                                <p>先进入到项目目录，然后启动：</p>
-                                <div class="code-block">
-                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
-                                    <code>cd your-project-folder
-gemini</code>
-                                </div>
-                                <p>首次启动需要完成以下设置：</p>
-                                <ul class="step-list">
-                                    <li>选择喜欢的主题（回车）</li>
-                                    <li>确认安全须知（回车）</li>
-                                    <li>信任工作目录（回车）</li>
-                                    <li>开始编程！🚀</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-
-    <!-- CTA Section -->
-    <section class="cta" id="cta">
-        <h2>准备好开始了吗？</h2>
-        <p>立即注册，获取免费体验额度，开启您的 AI 开发之旅。</p>
-        <a href="/register" class="btn-cta">免费注册</a>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <p>© 2025 MHcoding. All rights reserved.</p>
     </footer>
 
+    <!-- Global Toast Component -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 bg-textMain text-background text-sm font-bold shadow-[4px_4px_0px_rgba(37,99,235,1)] dark:shadow-[4px_4px_0px_rgba(56,189,248,1)] transition-all duration-300 opacity-0 pointer-events-none translate-y-4 z-50 flex items-center gap-2 border border-brand">
+        <i data-lucide="check" class="w-4 h-4"></i>
+        <span>内容已复制</span>
+    </div>
+
     <script>
-        // Theme Toggle
-        function toggleTheme() {
-            const html = document.documentElement;
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateThemeIcon(newTheme);
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Footer Year
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Theme Management
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        } else {
+            html.classList.remove('dark');
         }
 
-        function updateThemeIcon(theme) {
-            const icon = document.getElementById('theme-icon');
-            if (theme === 'dark') {
-                icon.innerHTML = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;
-            } else {
-                icon.innerHTML = `
-          <circle cx="12" cy="12" r="5"></circle>
-          <line x1="12" y1="1" x2="12" y2="3"></line>
-          <line x1="12" y1="21" x2="12" y2="23"></line>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-          <line x1="1" y1="12" x2="3" y2="12"></line>
-          <line x1="21" y1="12" x2="23" y2="12"></line>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-        `;
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
+        });
+
+        // Toast Notification System
+        const toast = document.getElementById('toast');
+        let toastTimeout;
+
+        function showToast(message) {
+            if(message) toast.querySelector('span').textContent = message;
+            toast.classList.remove('opacity-0', 'translate-y-4');
+            
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-4');
+            }, 2000);
+        }
+
+        // Copy Code Functionality
+        async function copyText(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                showToast();
+            } catch (err) {
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showToast();
+                } catch (e) {
+                    console.error('Copy failed', e);
+                }
+                document.body.removeChild(textArea);
             }
         }
 
-        // Initialize theme
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        updateThemeIcon(savedTheme);
-
-        // Scroll to section
-        function scrollToSection(sectionId) {
-            document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // Side navigation dots
-        const sections = document.querySelectorAll('section');
-        const navDots = document.querySelectorAll('.nav-dot');
-
-        window.addEventListener('scroll', () => {
-            let current = 0;
-            sections.forEach((section, index) => {
-                const sectionTop = section.offsetTop;
-                if (window.scrollY >= sectionTop - 300) {
-                    current = index;
-                }
-            });
-
-            navDots.forEach((dot, index) => {
-                dot.classList.remove('active');
-                if (index === current) {
-                    dot.classList.add('active');
-                }
-            });
-        });
-
-        // Replay logo animation
-        function replayLogoAnimation() {
-            const lines = document.querySelectorAll('.logo-line');
-            lines.forEach(line => {
-                line.style.animation = 'none';
-                line.offsetHeight; // trigger reflow
-                line.style.animation = null;
-            });
-        }
-
-        // Copy code
-        function copyCode(btn) {
-            const codeBlock = btn.parentElement.querySelector('code');
-            const text = codeBlock.textContent;
-            navigator.clipboard.writeText(text).then(() => {
-                btn.textContent = '已复制';
-                setTimeout(() => btn.textContent = '复制', 2000);
-            });
-        }
+        // Bind copy buttons to their respective code blocks
+        window.copyCode = function(btnElement) {
+            const codeBlock = btnElement.closest('.terminal-window').querySelector('code');
+            if (codeBlock) {
+                copyText(codeBlock.textContent);
+                
+                const icon = btnElement.querySelector('i');
+                const originalIcon = icon.getAttribute('data-lucide');
+                icon.setAttribute('data-lucide', 'check');
+                lucide.createIcons();
+                
+                setTimeout(() => {
+                    icon.setAttribute('data-lucide', originalIcon);
+                    lucide.createIcons();
+                }, 2000);
+            }
+        };
     </script>
 </body>
-
 </html>
