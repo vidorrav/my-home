@@ -1,583 +1,1142 @@
 <!DOCTYPE html>
-<html lang="zh-CN" class="dark">
-
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MHcoding | Unified AI Infrastructure</title>
-    <meta name="description" content="AI 开发工具统一接入平台，整合 Claude、GPT、Gemini 等主流 AI 模型">
-    
-    <!-- Google Fonts: Inter for UI, JetBrains Mono for Code -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS (CDN) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', '-apple-system', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
-                    },
-                    colors: {
-                        background: 'var(--background)',
-                        surface: 'var(--surface)',
-                        border: 'var(--border)',
-                        muted: 'var(--muted)',
-                        textMain: 'var(--text-main)',
-                        brand: 'var(--brand-accent)',
-                        brandHover: 'var(--brand-hover)',
-                    },
-                    animation: {
-                        'reveal-up': 'revealUp 0.8s cubic-bezier(0.19, 1, 0.22, 1) forwards',
-                        'draw-logo': 'drawLogo 2.5s cubic-bezier(0.25, 1, 0.5, 1) forwards',
-                        'faint-blink': 'faintBlink 5s ease-in-out infinite',
-                    },
-                    keyframes: {
-                        revealUp: {
-                            '0%': { opacity: 0, transform: 'translateY(30px)' },
-                            '100%': { opacity: 1, transform: 'translateY(0)' },
-                        },
-                        drawLogo: {
-                            '0%': { strokeDashoffset: '200' },
-                            '100%': { strokeDashoffset: '0' },
-                        },
-                        faintBlink: {
-                            '0%, 100%': { opacity: '0.08' },
-                            '50%': { opacity: '0.35' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MHcoding · 工程师的草稿本</title>
+<meta name="description" content="MHcoding API 中转站 — 一把 Key 接管 Claude Code、Codex、Gemini CLI">
 
-    <!-- Prism.js for Syntax Highlighting -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-toml.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Patrick+Hand&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
 
-    <style type="text/tailwindcss">
-        @layer base {
-            /* * 新配色系统: Slate & Sapphire (深空板岩与蓝宝石)
-             * 更冷静、更具科技感的极客美学
-             */
-            :root {
-                --background: #FFFFFF;
-                --surface: #F8FAFC; /* Slate 50 */
-                --border: #E2E8F0; /* Slate 200 */
-                --muted: #64748B; /* Slate 500 */
-                --text-main: #0F172A; /* Slate 900 */
-                --brand-accent: #2563EB; /* Blue 600 */
-                --brand-hover: #1D4ED8; /* Blue 700 */
-            }
-            .dark {
-                --background: #020617; /* Slate 950 */
-                --surface: #0F172A; /* Slate 900 */
-                --border: #1E293B; /* Slate 800 */
-                --muted: #94A3B8; /* Slate 400 */
-                --text-main: #F8FAFC; /* Slate 50 */
-                --brand-accent: #38BDF8; /* Sky 400 */
-                --brand-hover: #0EA5E9; /* Sky 500 */
-            }
-            body {
-                @apply bg-background text-textMain antialiased transition-colors duration-200 selection:bg-brand selection:text-white;
-            }
-            html {
-                scroll-behavior: smooth;
-            }
-        }
+<style>
+  :root {
+    --paper: #FFFCF2;
+    --paper-line: rgba(31, 41, 55, 0.07);
+    --ink: #1F2937;
+    --ink-soft: #4B5563;
+    --highlight-y: #FDE047;
+    --highlight-p: #FBCFE8;
+    --highlight-b: #BFDBFE;
+    --red: #EF4444;
+    --blue: #3B82F6;
+    --green: #10B981;
+    --sticky-y: #FEF9C3;
+    --sticky-g: #DCFCE7;
+    --sticky-b: #DBEAFE;
+    --sticky-p: #FCE7F3;
+  }
 
-        @layer components {
-            .btn-primary {
-                @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand text-white font-semibold rounded-none min-h-[44px] transition-all duration-200 hover:bg-brandHover active:scale-95 shadow-[4px_4px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_rgba(255,255,255,0.1)] border border-transparent dark:border-white/10;
-            }
-            .btn-secondary {
-                @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-surface text-textMain border border-border font-semibold rounded-none min-h-[44px] transition-all duration-200 hover:bg-border active:scale-95;
-            }
-            .grid-divider {
-                @apply border-border;
-            }
-            /* 终端机代码块样式 */
-            .terminal-window {
-                @apply rounded-none border border-border bg-[#0F172A] text-[#F8FAFC] font-mono text-sm relative mt-4 shadow-sm;
-            }
-            .terminal-header {
-                @apply flex items-center justify-between px-4 py-2 bg-[#1E293B] border-b border-[#334155] text-xs text-[#94A3B8];
-            }
-            .copy-btn {
-                @apply p-1.5 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-brand;
-            }
-            pre[class*="language-"] {
-                @apply !m-0 !p-4 !bg-transparent !text-sm;
-            }
-        }
+  html, body { background: var(--paper); }
 
-        /* SVG 绘制动画 */
-        .svg-draw-path {
-            stroke-dasharray: 200;
-            stroke-dashoffset: 200;
-            stroke-linecap: square;
-            stroke-linejoin: miter;
-        }
+  body {
+    font-family: 'Patrick Hand', 'Caveat', system-ui, sans-serif;
+    color: var(--ink);
+    background-color: var(--paper);
+    background-image:
+      radial-gradient(rgba(31, 41, 55, 0.035) 1px, transparent 1px),
+      linear-gradient(transparent 31px, var(--paper-line) 32px);
+    background-size: 4px 4px, 100% 32px;
+    background-attachment: fixed;
+    font-size: 18px;
+    line-height: 1.6;
+  }
 
-        /* 背景网格 */
-        .engineering-grid {
-            background-image: 
-                linear-gradient(to right, var(--border) 1px, transparent 1px),
-                linear-gradient(to bottom, var(--border) 1px, transparent 1px);
-            background-size: 40px 40px;
-            opacity: 0.3;
-        }
-    </style>
+  /* 字体 utility */
+  .font-hand { font-family: 'Caveat', cursive; }
+  .font-pen  { font-family: 'Patrick Hand', cursive; }
+  .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* 手绘边框 — 不规则圆角 + 黑色硬阴影 */
+  .sketch-box {
+    background: var(--paper);
+    border: 2.5px solid var(--ink);
+    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    box-shadow: 5px 5px 0 var(--ink);
+    position: relative;
+  }
+  .sketch-box-alt {
+    border-radius: 15px 225px 15px 255px / 225px 15px 255px 15px;
+  }
+
+  /* 便签 */
+  .sticky {
+    border: 1.5px dashed var(--ink);
+    box-shadow: 6px 6px 0 rgba(31, 41, 55, 0.15);
+    padding: 1.6rem 1.4rem;
+    position: relative;
+  }
+  .sticky-y { background: var(--sticky-y); transform: rotate(-1.5deg); }
+  .sticky-g { background: var(--sticky-g); transform: rotate(1deg); }
+  .sticky-b { background: var(--sticky-b); transform: rotate(-0.8deg); }
+  .sticky-p { background: var(--sticky-p); transform: rotate(1.6deg); }
+
+  /* 胶带 */
+  .tape {
+    position: absolute;
+    width: 80px;
+    height: 22px;
+    background: rgba(253, 224, 71, 0.7);
+    border: 1px dashed rgba(31, 41, 55, 0.3);
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-3deg);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  }
+
+  /* 草稿风按钮 */
+  .btn-sketch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: var(--highlight-y);
+    border: 2.5px solid var(--ink);
+    border-radius: 12px 30px 18px 24px;
+    padding: 0.8rem 1.8rem;
+    box-shadow: 5px 5px 0 var(--ink);
+    color: var(--ink);
+    font-family: 'Caveat', cursive;
+    font-size: 1.5rem;
+    font-weight: 700;
+    transform: rotate(-1deg);
+    transition: all 0.15s ease;
+    cursor: pointer;
+  }
+  .btn-sketch:hover {
+    transform: rotate(0) translate(2px, 2px);
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  .btn-sketch.outline { background: var(--paper); }
+  .btn-sketch.ink-bg { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  /* 荧光笔标注 */
+  .hl-y { background: linear-gradient(180deg, transparent 55%, var(--highlight-y) 55%, var(--highlight-y) 90%, transparent 90%); padding: 0 0.15em; }
+  .hl-p { background: linear-gradient(180deg, transparent 55%, var(--highlight-p) 55%, var(--highlight-p) 90%, transparent 90%); padding: 0 0.15em; }
+  .hl-b { background: linear-gradient(180deg, transparent 55%, var(--highlight-b) 55%, var(--highlight-b) 90%, transparent 90%); padding: 0 0.15em; }
+
+  /* 手绘下划线 */
+  .underline-wave {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8'><path d='M0 4 Q 12 1, 25 4 T 50 4 T 75 4 T 100 4' stroke='%231F2937' stroke-width='2' fill='none' stroke-linecap='round'/></svg>");
+    background-position: 0 100%;
+    background-repeat: repeat-x;
+    background-size: 100px 8px;
+    padding-bottom: 8px;
+  }
+
+  /* 红色钢笔批注 */
+  .red-mark {
+    color: var(--red);
+    font-family: 'Caveat', cursive;
+    font-size: 1.4rem;
+    transform: rotate(-3deg);
+    display: inline-block;
+  }
+
+  /* 终端窗口（草稿本风格） */
+  .terminal {
+    background: #FBF7E4;
+    border: 2px solid var(--ink);
+    border-radius: 8px 22px 8px 22px;
+    box-shadow: 3px 3px 0 var(--ink);
+    overflow: hidden;
+    margin-top: 0.5rem;
+  }
+  .terminal-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.4rem 0.8rem;
+    border-bottom: 1.5px dashed var(--ink);
+    background: rgba(31, 41, 55, 0.04);
+    font-family: 'Patrick Hand', cursive;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+  .terminal pre {
+    padding: 0.9rem 1rem;
+    margin: 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.55;
+    color: var(--ink);
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-x: auto;
+  }
+  .terminal pre .cmt { color: var(--ink-soft); font-style: italic; }
+  .terminal pre .key { color: var(--blue); font-weight: 600; }
+  .terminal pre .str { color: var(--green); }
+  .copy-btn {
+    background: transparent;
+    border: 1.2px solid var(--ink);
+    border-radius: 4px 12px 4px 12px;
+    padding: 1px 8px;
+    font-family: 'Patrick Hand', cursive;
+    font-size: 0.78rem;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .copy-btn:hover { background: var(--highlight-y); }
+
+  /* 步骤数字圆圈 */
+  .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 2.5px solid var(--ink);
+    border-radius: 50%;
+    background: var(--paper);
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+  .step-num.filled { background: var(--ink); color: var(--paper); }
+
+  /* 章节标题——大手写 + 下划线 */
+  .section-title {
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    line-height: 1.1;
+    color: var(--ink);
+    display: inline-block;
+  }
+
+  /* CLI 卡 */
+  .cli-card {
+    background: var(--paper);
+    border: 2.5px solid var(--ink);
+    border-radius: 18px 36px 18px 36px;
+    box-shadow: 6px 6px 0 var(--ink);
+    overflow: hidden;
+  }
+  .cli-card-header {
+    padding: 1.2rem 1.4rem;
+    border-bottom: 2.5px solid var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(253, 224, 71, 0.25);
+  }
+  .cli-icon {
+    width: 56px;
+    height: 56px;
+    border: 2.5px solid var(--ink);
+    border-radius: 50% 12% 50% 12%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 1.8rem;
+    background: var(--paper);
+  }
+
+  /* 会员卡 */
+  .tier-card {
+    border: 2.5px solid var(--ink);
+    border-radius: 18px 36px 18px 36px;
+    padding: 1.8rem 1.6rem;
+    box-shadow: 6px 6px 0 var(--ink);
+    background: var(--paper);
+    position: relative;
+    overflow: visible;
+  }
+  .tier-card.silent { background: #F3F4F6; transform: rotate(-1.2deg); }
+  .tier-card.vip    { background: #FEF3C7; transform: rotate(0.6deg); }
+  .tier-card.vvip   { background: var(--ink); color: var(--paper); transform: rotate(-0.5deg); border-color: var(--ink); }
+  .tier-card.vvip .ink-line { background: var(--paper); }
+  .tier-card.vvip .tier-rate { color: var(--highlight-y); }
+
+  .tier-rate {
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 4rem;
+    line-height: 1;
+    color: var(--red);
+  }
+
+  /* 会员小贴纸 */
+  .tier-badge {
+    position: absolute;
+    top: -16px;
+    right: 16px;
+    background: var(--highlight-y);
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 1.1rem;
+    transform: rotate(15deg);
+    box-shadow: 2px 2px 0 var(--ink);
+    text-align: center;
+    line-height: 1;
+  }
+  .tier-card.vvip .tier-badge { background: var(--red); color: var(--paper); }
+
+  /* 顶部小浮标（替代 nav） */
+  .float-corner {
+    position: fixed;
+    top: 1.4rem;
+    right: 1.4rem;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .float-logo {
+    width: 44px;
+    height: 44px;
+    border: 2.5px solid var(--ink);
+    border-radius: 50% 12% 50% 12%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--paper);
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+
+  /* Toast */
+  #toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--ink);
+    color: var(--paper);
+    padding: 0.7rem 1.4rem;
+    border-radius: 8px 22px 8px 22px;
+    box-shadow: 4px 4px 0 var(--highlight-y);
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: 1.2rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    z-index: 100;
+  }
+  #toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* 装饰：箭头/圈选 等 SVG 容器 */
+  .doodle { position: absolute; pointer-events: none; }
+
+  /* 折角效果 */
+  .dog-ear {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(135deg, transparent 50%, rgba(31, 41, 55, 0.15) 50%);
+    border-radius: 0 0 0 6px;
+  }
+
+  /* 平滑滚动 */
+  html { scroll-behavior: smooth; }
+
+  /* 响应式微调 */
+  @media (max-width: 640px) {
+    body { font-size: 16px; }
+    .tier-card { padding: 1.4rem 1.2rem; }
+    .tier-rate { font-size: 3.2rem; }
+  }
+</style>
 </head>
+<body class="overflow-x-hidden">
 
-<body class="relative flex flex-col min-h-screen">
+  <!-- 右上角浮标（替代 nav） -->
+  <div class="float-corner">
+    <div class="float-logo">
+      <svg viewBox="0 0 100 50" class="w-7 h-7" stroke="#1F2937" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10 40 V10 L25 25 L40 10 V40" />
+        <path d="M60 10 V40 M60 25 H90 M90 10 V40" />
+      </svg>
+    </div>
+    <a href="https://www.mhcoding.xyz/dashboard/overview" class="btn-sketch !text-base !py-2 !px-4">
+      控制台 <i data-lucide="arrow-right" class="w-4 h-4"></i>
+    </a>
+  </div>
 
-    <!-- 全局背景网格 -->
-    <div class="fixed inset-0 pointer-events-none engineering-grid z-[-1]"></div>
+  <!-- ===== HERO ===== -->
+  <section class="min-h-[88vh] flex items-center justify-center relative px-6 pt-24 pb-16">
 
-    <!-- 导航列 -->
-    <header class="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md border-b grid-divider">
-        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-            <a href="#hero" class="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-brand">
-                <div class="w-8 h-8 flex items-center justify-center border-2 border-textMain dark:border-white group-hover:border-brand transition-colors">
-                    <svg viewBox="0 0 100 50" class="w-5 h-5 stroke-textMain dark:stroke-white group-hover:stroke-brand transition-colors" stroke-width="8" fill="none" stroke-linecap="square">
-                        <path d="M10 40 V10 L25 25 L40 10 V40" />
-                        <path d="M60 10 V40 M60 25 H90 M90 10 V40" />
-                    </svg>
-                </div>
-                <span class="font-bold text-lg tracking-tight">MHcoding <span class="text-brand">API</span></span>
-            </a>
-            
-            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-muted">
-                <a href="#features" class="hover:text-textMain transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand">架构特性</a>
-                <a href="#cli-setup" class="hover:text-textMain transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand">部署文档</a>
-                <a href="#cta" class="hover:text-textMain transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand">快速开始</a>
-            </nav>
+    <!-- 背景 doodles -->
+    <svg class="doodle" style="top: 18%; left: 6%; width: 90px; height: 90px; opacity: 0.5;" viewBox="0 0 100 100" fill="none" stroke="#1F2937" stroke-width="2" stroke-linecap="round">
+      <path d="M20 80 Q 50 10, 80 80" stroke-dasharray="4 6"/>
+      <circle cx="50" cy="55" r="3" fill="#1F2937"/>
+    </svg>
+    <svg class="doodle" style="top: 12%; right: 10%; width: 110px; height: 110px; opacity: 0.4;" viewBox="0 0 100 100" fill="none" stroke="#1F2937" stroke-width="2">
+      <path d="M10 50 Q 30 20, 50 50 T 90 50" stroke-linecap="round"/>
+      <path d="M85 45 L 92 50 L 85 55" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <svg class="doodle" style="bottom: 8%; left: 12%; width: 70px; height: 70px; opacity: 0.6;" viewBox="0 0 100 100" fill="none" stroke="#EF4444" stroke-width="2.5" stroke-linecap="round">
+      <path d="M30 30 L 70 70 M 70 30 L 30 70"/>
+    </svg>
 
-            <div class="flex items-center gap-4">
-                <button id="themeToggle" class="p-2 text-muted hover:text-textMain transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand" aria-label="切换主题">
-                    <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
-                    <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
-                </button>
-                <!-- 更新为绝对路径以避免 404 -->
-                <a href="https://www.mhcoding.xyz/console" class="btn-primary !px-5 !py-2 !text-sm">
-                    控制台 <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                </a>
-            </div>
+    <div class="max-w-4xl mx-auto text-center relative z-10">
+      <h1 class="font-hand font-bold text-[clamp(3rem,9vw,7rem)] leading-[1] mb-4">
+        一把 <span class="hl-y">Key</span><br/>
+        接管你的 <span class="hl-p underline-wave">终端</span>。
+      </h1>
+
+      <p class="font-pen text-xl md:text-2xl text-[var(--ink-soft)] max-w-2xl mx-auto mb-3 leading-relaxed">
+        把 Claude Code、Codex、Gemini CLI 都喂给同一个端点。
+      </p>
+      <p class="font-hand text-2xl text-[var(--red)] mb-12" style="transform: rotate(-1deg); display: inline-block;">
+        — 没有花活，按量付费，原生体验。
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-5 justify-center items-center">
+        <a href="https://www.mhcoding.xyz/keys" class="btn-sketch text-2xl px-8 py-4">
+          领接入令牌 <i data-lucide="arrow-right" class="w-5 h-5"></i>
+        </a>
+        <a href="#cli-setup" class="btn-sketch outline text-2xl px-8 py-4" style="transform: rotate(1deg);">
+          看配置文档
+        </a>
+      </div>
+
+      <!-- 手绘箭头指向 CTA -->
+      <svg class="doodle hidden md:block" style="top: 78%; left: 50%; transform: translateX(-200%) rotate(20deg); width: 90px; height: 60px;" viewBox="0 0 100 60" fill="none" stroke="#EF4444" stroke-width="2.5" stroke-linecap="round">
+        <path d="M5 10 Q 40 5, 80 45" stroke-dasharray="0"/>
+        <path d="M70 35 L 85 50 L 65 52" stroke-linejoin="round"/>
+      </svg>
+      <p class="font-hand text-xl text-[var(--red)] mt-2" style="transform: rotate(-2deg);">点这里 ↑</p>
+    </div>
+  </section>
+
+  <!-- ===== FEATURES（便签墙） ===== -->
+  <section class="py-20 px-6 relative">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="section-title">为什么用 <span class="hl-b">这个？</span></h2>
+        <p class="font-pen text-lg text-[var(--ink-soft)] mt-4">写在便签上随手贴的几条理由。</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="sticky sticky-y">
+          <div class="tape"></div>
+          <i data-lucide="plug" class="w-7 h-7 mb-3"></i>
+          <h3 class="font-hand text-3xl mb-2">统一端点</h3>
+          <p class="font-pen text-base">一个 base_url，下接所有主流 CLI。换模型不换工具。</p>
         </div>
-    </header>
+        <div class="sticky sticky-g">
+          <div class="tape" style="background: rgba(190, 242, 100, 0.7);"></div>
+          <i data-lucide="zap" class="w-7 h-7 mb-3"></i>
+          <h3 class="font-hand text-3xl mb-2">秒级响应</h3>
+          <p class="font-pen text-base">边缘节点 + 流式直通。打字感知不到延迟。</p>
+        </div>
+        <div class="sticky sticky-b">
+          <div class="tape" style="background: rgba(147, 197, 253, 0.7);"></div>
+          <i data-lucide="shield" class="w-7 h-7 mb-3"></i>
+          <h3 class="font-hand text-3xl mb-2">不留痕迹</h3>
+          <p class="font-pen text-base">请求体不落盘、不缓存、不训练。中转层只搬运不窥探。</p>
+        </div>
+        <div class="sticky sticky-p">
+          <div class="tape" style="background: rgba(249, 168, 212, 0.7);"></div>
+          <i data-lucide="receipt" class="w-7 h-7 mb-3"></i>
+          <h3 class="font-hand text-3xl mb-2">透明计费</h3>
+          <p class="font-pen text-base">官价对齐，按 token 实计。<span class="hl-y">充得越多倍率越低。</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <!-- 主要内容 -->
-    <main class="flex-grow pt-16">
-        
-        <!-- Hero Section -->
-        <section id="hero" class="min-h-[85vh] flex items-center justify-center relative overflow-hidden border-b grid-divider">
-            
-            <!-- 动态背景容器 -->
-            <div class="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
-                <!-- 工业风背景图 -->
-                <img src="https://picsum.photos/id/249/1920/1080" alt="Industrial Architecture" class="absolute inset-0 w-full h-full object-cover grayscale opacity-20 dark:opacity-30 mix-blend-multiply dark:mix-blend-screen" />
-                
-                <!-- 巨大的 SVG 闪烁 Logo 背景 -->
-                <div class="w-full max-w-[900px] absolute inset-0 m-auto flex items-center justify-center mix-blend-overlay dark:mix-blend-screen animate-faint-blink">
-                    <!-- 定义 Logo 渐变色 -->
-                    <svg class="w-0 h-0 absolute">
-                        <defs>
-                            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#2563EB" />
-                                <stop offset="100%" stop-color="#0EA5E9" />
-                            </linearGradient>
-                            <linearGradient id="logoGradientDark" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#38BDF8" />
-                                <stop offset="100%" stop-color="#818CF8" />
-                            </linearGradient>
-                        </defs>
-                    </svg>
+  <!-- ===== TIER（充值档位） ===== -->
+  <section class="py-20 px-6 relative">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-20">
+        <h2 class="section-title">充得越多，<span class="hl-y">倍率越低</span></h2>
+        <p class="font-pen text-lg text-[var(--ink-soft)] mt-4">
+          按累计充值额自动升档。<span class="red-mark">不会降档</span>，就像草稿本只能往后翻。
+        </p>
+      </div>
 
-                    <svg viewBox="0 0 100 50" class="w-full h-full stroke-textMain dark:stroke-white" stroke-width="2.5" fill="none" stroke-linecap="square" stroke-linejoin="miter">
-                        <!-- M -->
-                        <path d="M10 40 V10 L25 25 L40 10 V40" class="svg-draw-path animate-draw-logo" />
-                        <!-- H -->
-                        <path d="M60 10 V40 M60 25 H90 M90 10 V40" class="svg-draw-path animate-draw-logo" style="animation-delay: 0.5s;" />
-                        
-                        <!-- 装饰线条 -->
-                        <path d="M0 45 H100" class="stroke-brand svg-draw-path animate-draw-logo" stroke-width="1" style="animation-delay: 1s;" />
-                        <path d="M0 5 H100" class="stroke-border svg-draw-path animate-draw-logo" stroke-width="1" style="animation-delay: 1.2s;" />
-                    </svg>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+
+        <!-- 沉默 -->
+        <div class="tier-card silent">
+          <div class="tier-badge" style="background: #E5E7EB;">沉默</div>
+          <p class="font-pen text-sm text-[var(--ink-soft)] mb-1">累计 &lt; ¥500</p>
+          <h3 class="font-hand text-4xl font-bold mb-1">默认档</h3>
+          <div class="ink-line h-[2px] bg-[var(--ink)] my-3" style="opacity: 0.4;"></div>
+          <div class="flex items-baseline gap-1 mb-2">
+            <span class="tier-rate">2x</span>
+            <span class="font-pen text-base text-[var(--ink-soft)]">官价倍率</span>
+          </div>
+          <p class="font-pen text-base mb-4">全部渠道按 2 倍计费。开始尝试 / 小流量调试期使用。</p>
+          <ul class="font-pen text-base space-y-1.5">
+            <li class="flex gap-2"><span class="text-[var(--ink-soft)]">·</span> 全模型可用</li>
+            <li class="flex gap-2"><span class="text-[var(--ink-soft)]">·</span> 标准并发</li>
+            <li class="flex gap-2"><span class="text-[var(--ink-soft)]">·</span> 工单 24h 响应</li>
+          </ul>
+        </div>
+
+        <!-- VIP -->
+        <div class="tier-card vip">
+          <div class="tier-badge">VIP<br/>★</div>
+          <p class="font-pen text-sm text-[var(--ink-soft)] mb-1">累计 ¥500 — ¥3500</p>
+          <h3 class="font-hand text-4xl font-bold mb-1">VIP 档</h3>
+          <div class="ink-line h-[2px] bg-[var(--ink)] my-3" style="opacity: 0.4;"></div>
+          <div class="flex items-baseline gap-1 mb-2">
+            <span class="tier-rate">1.75x</span>
+            <span class="font-pen text-base text-[var(--ink-soft)]">部分渠道</span>
+          </div>
+          <p class="font-pen text-base mb-4">高频使用渠道降至 1.75 倍，其余渠道维持 2 倍。</p>
+          <ul class="font-pen text-base space-y-1.5">
+            <li class="flex gap-2"><span>·</span> <span class="hl-y">主力模型 1.75x</span></li>
+            <li class="flex gap-2"><span>·</span> 提升并发上限</li>
+            <li class="flex gap-2"><span>·</span> 专属技术群</li>
+          </ul>
+        </div>
+
+        <!-- VVIP -->
+        <div class="tier-card vvip">
+          <div class="tier-badge">VVIP</div>
+          <p class="font-pen text-sm opacity-75 mb-1">累计 ≥ ¥3500</p>
+          <h3 class="font-hand text-4xl font-bold mb-1">VVIP 档</h3>
+          <div class="ink-line h-[2px] my-3" style="opacity: 0.4;"></div>
+          <div class="flex items-baseline gap-1 mb-2">
+            <span class="tier-rate">1.5x</span>
+            <span class="font-pen text-base opacity-80">部分渠道</span>
+          </div>
+          <p class="font-pen text-base mb-4 opacity-95">最低倍率。重度使用 / 团队协作场景。</p>
+          <ul class="font-pen text-base space-y-1.5">
+            <li class="flex gap-2"><span>·</span> <span style="color: var(--highlight-y);">主力模型 1.5x</span></li>
+            <li class="flex gap-2"><span>·</span> 最高并发 / 优先调度</li>
+            <li class="flex gap-2"><span>·</span> 1v1 技术对接</li>
+          </ul>
+          <div class="dog-ear" style="background: linear-gradient(135deg, transparent 50%, rgba(255, 252, 242, 0.15) 50%);"></div>
+        </div>
+      </div>
+
+      <!-- 注脚 -->
+      <div class="mt-12 max-w-3xl mx-auto">
+        <div class="sketch-box sketch-box-alt p-5">
+          <p class="font-pen text-base text-[var(--ink-soft)]">
+            <span class="font-hand text-xl text-[var(--ink)]">注：</span>
+            档位由<span class="hl-y">累计充值额</span>自动判定，无需申请。"部分渠道"指主力模型（如 Claude Sonnet/Haiku、GPT-4o、Gemini Pro 等高频路由），具体清单以
+            <a href="https://www.mhcoding.xyz/dashboard/overview" class="underline decoration-wavy decoration-[var(--red)]">控制台</a>
+            为准。倍率随档位自动应用，不需手动切换。
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CLI SETUP ===== -->
+  <section id="cli-setup" class="py-20 px-6 relative">
+    <div class="max-w-6xl mx-auto">
+
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+        <div>
+          <h2 class="section-title">配置 <span class="hl-p">CLI</span></h2>
+          <p class="font-pen text-lg text-[var(--ink-soft)] mt-3">
+            每个客户端 5 步走完。<span class="red-mark">↓ 抄就完事了</span>
+          </p>
+        </div>
+        <div class="sketch-box sketch-box-alt px-5 py-3 flex items-center gap-3 self-start md:self-auto" style="transform: rotate(-1deg);">
+          <span class="font-pen text-sm text-[var(--ink-soft)]">统一端点</span>
+          <code class="font-mono text-sm font-semibold">https://www.mhcoding.xyz</code>
+          <button class="copy-btn" onclick="copyText('https://www.mhcoding.xyz')">复制</button>
+        </div>
+      </div>
+
+      <!-- ====== Claude Code ====== -->
+      <div class="cli-card mb-12">
+        <div class="cli-card-header">
+          <div class="cli-icon">C</div>
+          <div>
+            <h3 class="font-hand text-3xl font-bold leading-tight">Claude Code</h3>
+            <p class="font-pen text-sm text-[var(--ink-soft)]">Anthropic 官方 CLI · 推荐使用</p>
+          </div>
+          <span class="ml-auto font-pen text-sm px-3 py-1 border-2 border-dashed border-[var(--ink)] rounded-full" style="transform: rotate(-2deg);">最常用</span>
+        </div>
+
+        <div class="p-6 md:p-8 grid grid-cols-1 lg:grid-cols-2 gap-x-10 gap-y-8">
+
+          <div class="space-y-4">
+            <div class="flex gap-3 items-start">
+              <span class="step-num filled">1</span>
+              <div class="flex-1">
+                <h4 class="font-hand text-2xl">检查环境</h4>
+                <p class="font-pen text-sm text-[var(--ink-soft)] mb-1">需要 Node.js 18+。没有先去 <a href="https://nodejs.org" class="underline decoration-wavy decoration-[var(--blue)]">nodejs.org</a> 装一个。</p>
+                <div class="terminal">
+                  <div class="terminal-bar"><span>$ check</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<pre>node -v   <span class="cmt"># v18 或以上</span>
+npm -v</pre>
                 </div>
+              </div>
             </div>
 
-            <!-- Hero 文字内容 -->
-            <div class="max-w-7xl mx-auto px-6 w-full flex flex-col items-center justify-center text-center relative z-10 py-20">
-                <div class="opacity-0 animate-reveal-up flex flex-col items-center">
-                    <div class="inline-flex items-center justify-center gap-2 px-3 py-1 mb-8 border border-border bg-surface/80 backdrop-blur text-xs font-bold uppercase tracking-widest text-brand">
-                        <span class="w-2 h-2 bg-brand rounded-none animate-pulse"></span>
-                        Unified Architecture
-                    </div>
-                    
-                    <h1 class="text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter leading-[1.1] mb-8 drop-shadow-sm">
-                        极简接入<br />
-                        <span class="text-muted">开发者的</span><br />
-                        专属网关
-                    </h1>
-                    
-                    <p class="text-lg md:text-xl text-muted max-w-2xl mb-12 leading-relaxed font-medium drop-shadow-sm">
-                        抛弃混乱的密钥与账单。一个 MHcoding API Key，工业级接管 Claude Code, Codex 与 Gemini CLI。
-                    </p>
-                    
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto">
-                        <!-- 更新为绝对路径以避免 404 -->
-                        <a href="https://www.mhcoding.xyz/console" class="btn-primary text-lg px-8 py-4">
-                            获取接入令牌
-                        </a>
-                        <a href="#cli-setup" class="btn-secondary text-lg px-8 py-4">
-                            查看文档
-                        </a>
-                    </div>
+            <div class="flex gap-3 items-start">
+              <span class="step-num filled">2</span>
+              <div class="flex-1">
+                <h4 class="font-hand text-2xl">全局安装</h4>
+                <div class="terminal">
+                  <div class="terminal-bar"><span>$ install</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<pre>npm install -g @anthropic-ai/claude-code</pre>
                 </div>
+              </div>
             </div>
-            
-            <!-- 渐变遮罩以确保文字可读性 -->
-            <div class="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent z-0 pointer-events-none"></div>
-        </section>
 
-        <!-- Features Section -->
-        <section id="features" class="border-b grid-divider">
-            <div class="max-w-7xl mx-auto">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-                    
-                    <!-- Feature 1 -->
-                    <div class="p-10 border-b lg:border-b-0 lg:border-r grid-divider hover:bg-surface transition-colors group">
-                        <i data-lucide="binary" class="w-8 h-8 mb-6 text-brand"></i>
-                        <h3 class="text-xl font-bold tracking-tight mb-3">统一协议</h3>
-                        <p class="text-sm text-muted leading-relaxed">彻底消除多平台对接成本。使用统一标准端点，无缝向下分发至各个大模型原生 CLI 工具。</p>
-                    </div>
-                    
-                    <!-- Feature 2 -->
-                    <div class="p-10 border-b lg:border-b-0 lg:border-r grid-divider hover:bg-surface transition-colors group">
-                        <i data-lucide="zap" class="w-8 h-8 mb-6 text-brand"></i>
-                        <h3 class="text-xl font-bold tracking-tight mb-3">毫秒级调度</h3>
-                        <p class="text-sm text-muted leading-relaxed">构建在边缘计算节点之上，提供原生级别的流式输出体验，不增加任何感知延迟。</p>
-                    </div>
-                    
-                    <!-- Feature 3 -->
-                    <div class="p-10 border-b md:border-b-0 lg:border-r grid-divider hover:bg-surface transition-colors group">
-                        <i data-lucide="lock" class="w-8 h-8 mb-6 text-brand"></i>
-                        <h3 class="text-xl font-bold tracking-tight mb-3">企业级加密</h3>
-                        <p class="text-sm text-muted leading-relaxed">密钥及请求数据全程采用端到端加密，不在中转层留存任何用户代码或提问数据。</p>
-                    </div>
-                    
-                    <!-- Feature 4 -->
-                    <div class="p-10 hover:bg-surface transition-colors group">
-                        <i data-lucide="scale" class="w-8 h-8 mb-6 text-brand"></i>
-                        <h3 class="text-xl font-bold tracking-tight mb-3">1:1 公平计费</h3>
-                        <p class="text-sm text-muted leading-relaxed">采用按量付费模式，严格对标官方汇率与定价模型，拒绝任何隐藏的 token 溢价。</p>
-                    </div>
+            <div class="flex gap-3 items-start">
+              <span class="step-num filled">3</span>
+              <div class="flex-1">
+                <h4 class="font-hand text-2xl">找到配置文件</h4>
+                <p class="font-pen text-sm text-[var(--ink-soft)] mb-1">不同系统路径不一样：</p>
+                <div class="terminal">
+                  <div class="terminal-bar"><span>~/.claude/settings.json</span></div>
+<pre><span class="cmt"># macOS / Linux</span>
+~/.claude/settings.json
 
+<span class="cmt"># Windows (PowerShell)</span>
+$env:USERPROFILE\.claude\settings.json
+<span class="cmt"># 即 C:\Users\&lt;你&gt;\.claude\settings.json</span></pre>
                 </div>
+              </div>
             </div>
-        </section>
+          </div>
 
-        <!-- CLI Setup Documentation Section -->
-        <section id="cli-setup" class="py-24 bg-surface/50 border-b grid-divider">
-            <div class="max-w-7xl mx-auto px-6">
-                
-                <div class="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
-                    <div>
-                        <h2 class="text-4xl font-extrabold tracking-tight mb-4">部署文档</h2>
-                        <p class="text-lg text-muted">标准化的三步配置，接管你的终端编程体验。</p>
-                    </div>
-                    <!-- Global Config Copy -->
-                    <div class="bg-background border border-border px-4 py-3 flex items-center gap-4 shadow-sm">
-                        <div class="text-sm font-mono text-muted">Endpoint: <span class="text-textMain font-bold">https://www.mhcoding.xyz/</span></div>
-                        <button class="p-1 text-muted hover:text-brand transition-colors" onclick="copyText('https://www.mhcoding.xyz/')" title="复制 API 接口">
-                            <i data-lucide="copy" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    
-                    <!-- Claude Code -->
-                    <div class="bg-background border border-border flex flex-col">
-                        <div class="p-6 border-b grid-divider flex items-center gap-4">
-                            <div class="w-10 h-10 bg-[#0F172A] border border-[#1E293B] flex items-center justify-center text-white font-bold">C</div>
-                            <div>
-                                <h3 class="font-bold text-lg leading-tight">Claude Code</h3>
-                                <p class="text-xs text-muted">Anthropic 官方客户端</p>
-                            </div>
-                        </div>
-                        <div class="p-6 flex-1 flex flex-col gap-6">
-                            <div>
-                                <h4 class="text-sm font-bold flex items-center gap-2 mb-2"><span class="text-brand">01</span> 安装</h4>
-                                <div class="terminal-window">
-                                    <div class="terminal-header">
-                                        <span>Terminal</span>
-                                        <button class="copy-btn" onclick="copyCode(this)"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
-                                    </div>
-                                    <pre><code class="language-bash">npm install -g @anthropic-ai/claude-code</code></pre>
-                                </div>
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-bold flex items-center gap-2 mb-2"><span class="text-brand">02</span> 配置 (settings.json)</h4>
-                                <div class="terminal-window">
-                                    <div class="terminal-header">
-                                        <span>~/.claude/settings.json</span>
-                                        <button class="copy-btn" onclick="copyCode(this)"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
-                                    </div>
-                                    <pre><code class="language-json">{
-  "env": {
-    "ANTHROPIC_AUTH_TOKEN": "YOUR_API_KEY",
-    "ANTHROPIC_BASE_URL": "https://www.mhcoding.xyz/"
+          <div class="space-y-4">
+            <div class="flex gap-3 items-start">
+              <span class="step-num filled">4</span>
+              <div class="flex-1">
+                <h4 class="font-hand text-2xl">写入配置</h4>
+                <p class="font-pen text-sm text-[var(--ink-soft)] mb-1">把 <code class="font-mono text-xs bg-[var(--highlight-y)] px-1">YOUR_API_KEY</code> 换成你的 Key。</p>
+                <div class="terminal">
+                  <div class="terminal-bar"><span>settings.json</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<pre>{
+  <span class="key">"env"</span>: {
+    <span class="key">"ANTHROPIC_AUTH_TOKEN"</span>: <span class="str">"YOUR_API_KEY"</span>,
+    <span class="key">"ANTHROPIC_BASE_URL"</span>: <span class="str">"https://www.mhcoding.xyz"</span>
   }
-}</code></pre>
-                                </div>
-                            </div>
-                            <div class="mt-auto pt-4">
-                                <h4 class="text-sm font-bold flex items-center gap-2 mb-2"><span class="text-brand">03</span> 启动</h4>
-                                <div class="terminal-window">
-                                    <pre><code class="language-bash">claude</code></pre>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+}</pre>
+                </div>
+              </div>
+            </div>
 
-                    <!-- Codex CLI -->
-                    <div class="bg-background border border-border flex flex-col">
-                        <div class="p-6 border-b grid-divider flex items-center gap-4 relative overflow-hidden">
-                            <div class="absolute inset-0 engineering-grid opacity-50 pointer-events-none"></div>
-                            <div class="w-10 h-10 bg-[#0F172A] border border-[#1E293B] flex items-center justify-center text-white font-bold relative z-10">O</div>
-                            <div class="relative z-10">
-                                <h3 class="font-bold text-lg leading-tight">Codex CLI</h3>
-                                <p class="text-xs text-muted">OpenAI 官方客户端</p>
-                            </div>
-                        </div>
-                        <div class="p-6 flex-1 flex flex-col gap-6">
-                            <div class="bg-surface border-l-4 border-brand p-3 text-xs text-textMain font-medium">
-                                注意：Codex 需要使用 Node 22+ 及特定的专属 API Key。
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-bold flex items-center gap-2 mb-2"><span class="text-brand">01</span> 安装</h4>
-                                <div class="terminal-window">
-                                    <div class="terminal-header">
-                                        <span>Terminal</span>
-                                        <button class="copy-btn" onclick="copyCode(this)"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
-                                    </div>
-                                    <pre><code class="language-bash">npm install -g @openai/codex</code></pre>
-                                </div>
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-bold flex items-center gap-2 mb-2"><span class="text-brand">02</span> 配置 (config.toml)</h4>
-                                <div class="terminal-window">
-                                    <div class="terminal-header">
-                                        <span>~/.codex/config.toml</span>
-                                        <button class="copy-btn" onclick="copyCode(this)"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
-                                    </div>
-                                    <pre><code class="language-toml">[model_providers.mhcoding]
-name = "mhcoding"
-base_url = "https://www.mhcoding.xyz/v1"
-wire_api = "responses"
-requires_openai_auth = true</code></pre>
-                                </div>
-                            </div>
-                            <div class="mt-auto pt-4">
-                                <h4 class="text-sm font-bold flex items-center gap-2 mb-2"><span class="text-brand">03</span> 凭证 (auth.json)</h4>
-                                <div class="terminal-window">
-                                    <div class="terminal-header">
-                                        <span>~/.codex/auth.json</span>
-                                        <button class="copy-btn" onclick="copyCode(this)"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
-                                    </div>
-                                    <pre><code class="language-json">{ "OPENAI_API_KEY": "YOUR_KEY" }</code></pre>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="flex gap-3 items-start">
+              <span class="step-num filled">5</span>
+              <div class="flex-1">
+                <h4 class="font-hand text-2xl">启动 + 验证</h4>
+                <div class="terminal">
+                  <div class="terminal-bar"><span>$ run</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<pre>cd 你的项目目录
+claude
+<span class="cmt"># 输入：你好，看一下当前目录</span></pre>
+                </div>
+                <p class="font-pen text-sm text-[var(--red)] mt-2">
+                  报 401？检查 Key 没空格、Base URL 末尾不带斜杠、AUTH_TOKEN 别写成 API_KEY。
+                </p>
+              </div>
+            </div>
+          </div>
 
-                    <!-- Gemini CLI -->
-                    <div class="bg-background border border-border flex flex-col">
-                        <div class="p-6 border-b grid-divider flex items-center gap-4">
-                            <div class="w-10 h-10 bg-[#0F172A] border border-[#1E293B] flex items-center justify-center text-white font-bold">G</div>
-                            <div>
-                                <h3 class="font-bold text-lg leading-tight">Gemini CLI</h3>
-                                <p class="text-xs text-muted">Google 官方客户端</p>
-                            </div>
-                        </div>
-                        <div class="p-6 flex-1 flex flex-col gap-6">
-                            <div>
-                                <h4 class="text-sm font-bold flex items-center gap-2 mb-2"><span class="text-brand">01</span> 安装</h4>
-                                <div class="terminal-window">
-                                    <div class="terminal-header">
-                                        <span>Terminal</span>
-                                        <button class="copy-btn" onclick="copyCode(this)"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
-                                    </div>
-                                    <pre><code class="language-bash">npm install -g @google/gemini-cli</code></pre>
-                                </div>
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-bold flex items-center gap-2 mb-2"><span class="text-brand">02</span> 环境 (.env)</h4>
-                                <div class="terminal-window">
-                                    <div class="terminal-header">
-                                        <span>~/.gemini/.env</span>
-                                        <button class="copy-btn" onclick="copyCode(this)"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
-                                    </div>
-                                    <pre><code class="language-bash">GOOGLE_GEMINI_BASE_URL=https://www.mhcoding.xyz/
+        </div>
+      </div>
+
+      <!-- ====== Codex CLI ====== -->
+      <div class="cli-card mb-12" style="border-radius: 36px 18px 36px 18px;">
+        <div class="cli-card-header" style="background: rgba(147, 197, 253, 0.25);">
+          <div class="cli-icon" style="border-radius: 12% 50% 12% 50%;">O</div>
+          <div>
+            <h3 class="font-hand text-3xl font-bold leading-tight">Codex CLI</h3>
+            <p class="font-pen text-sm text-[var(--ink-soft)]">OpenAI 官方 CLI · 需 Node 22+</p>
+          </div>
+          <span class="ml-auto font-pen text-sm px-3 py-1 bg-[var(--red)] text-[var(--paper)] rounded-full" style="transform: rotate(2deg);">用专属 Key</span>
+        </div>
+
+        <div class="p-6 md:p-8 grid grid-cols-1 lg:grid-cols-2 gap-x-10 gap-y-8">
+
+          <div class="space-y-4">
+            <div class="sketch-box sketch-box-alt p-3 mb-2" style="background: var(--sticky-y);">
+              <p class="font-pen text-sm">
+                <span class="font-hand text-lg">⚠ 注意：</span>
+                Codex 必须用 <span class="hl-y">Codex 专属 API Key</span>（不是通用 Key），并且要 Node 22 及以上。
+              </p>
+            </div>
+
+            <div class="flex gap-3 items-start">
+              <span class="step-num filled">1</span>
+              <div class="flex-1">
+                <h4 class="font-hand text-2xl">环境检查</h4>
+                <div class="terminal">
+                  <div class="terminal-bar"><span>$ check</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<pre>node -v   <span class="cmt"># 必须 v22+</span></pre>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex gap-3 items-start">
+              <span class="step-num filled">2</span>
+              <div class="flex-1">
+                <h4 class="font-hand text-2xl">安装</h4>
+                <div class="terminal">
+                  <div class="terminal-bar"><span>$ install</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<pre>npm install -g @openai/codex</pre>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex gap-3 items-start">
+              <span class="step-num filled">3</span>
+              <div class="flex-1">
+                <h4 class="font-hand text-2xl">配置 Provider</h4>
+                <div class="terminal">
+                  <div class="terminal-bar"><span>~/.codex/config.toml</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<pre><span class="cmt"># macOS/Linux: ~/.codex/config.toml</span>
+<span class="cmt"># Windows:     %USERPROFILE%\.codex\config.toml</span>
+
+[model_providers.mhcoding]
+name = <span class="str">"mhcoding"</span>
+base_url = <span class="str">"https://www.mhcoding.xyz/v1"</span>
+wire_api = <span class="str">"responses"</span>
+requires_openai_auth = true
+
+[profiles.default]
+model_provider = <span class="str">"mhcoding"</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <div class="flex gap-3 items-start">
+              <span class="step-num filled">4</span>
+              <div class="flex-1">
+                <h4 class="font-hand text-2xl">写入凭证</h4>
+                <p class="font-pen text-sm text-[var(--ink-soft)] mb-1">单独的 auth.json：</p>
+                <div class="terminal">
+                  <div class="terminal-bar"><span>~/.codex/auth.json</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<pre>{
+  <span class="key">"OPENAI_API_KEY"</span>: <span class="str">"YOUR_CODEX_KEY"</span>
+}</pre>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex gap-3 items-start">
+              <span class="step-num filled">5</span>
+              <div class="flex-1">
+                <h4 class="font-hand text-2xl">启动</h4>
+                <div class="terminal">
+                  <div class="terminal-bar"><span>$ run</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<pre>codex
+<span class="cmt"># 首次启动会自动读取 config.toml + auth.json</span></pre>
+                </div>
+                <p class="font-pen text-sm text-[var(--red)] mt-2">
+                  报"unsupported model"？确认 wire_api 是 <code class="font-mono text-xs">responses</code>，不是 chat/completions。
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ====== Gemini CLI ====== -->
+      <div class="cli-card">
+        <div class="cli-card-header" style="background: rgba(167, 243, 208, 0.3);">
+          <div class="cli-icon">G</div>
+          <div>
+            <h3 class="font-hand text-3xl font-bold leading-tight">Gemini CLI</h3>
+            <p class="font-pen text-sm text-[var(--ink-soft)]">Google 官方 CLI</p>
+          </div>
+        </div>
+
+        <div class="p-6 md:p-8 grid grid-cols-1 lg:grid-cols-2 gap-x-10 gap-y-8">
+
+          <div class="space-y-4">
+            <div class="flex gap-3 items-start">
+              <span class="step-num filled">1</span>
+              <div class="flex-1">
+                <h4 class="font-hand text-2xl">环境</h4>
+                <div class="terminal">
+                  <div class="terminal-bar"><span>$ check</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<pre>node -v   <span class="cmt"># v18+</span></pre>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex gap-3 items-start">
+              <span class="step-num filled">2</span>
+              <div class="flex-1">
+                <h4 class="font-hand text-2xl">安装</h4>
+                <div class="terminal">
+                  <div class="terminal-bar"><span>$ install</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<pre>npm install -g @google/gemini-cli</pre>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex gap-3 items-start">
+              <span class="step-num filled">3</span>
+              <div class="flex-1">
+                <h4 class="font-hand text-2xl">配置环境变量</h4>
+                <div class="terminal">
+                  <div class="terminal-bar"><span>~/.gemini/.env</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<pre><span class="cmt"># macOS/Linux: ~/.gemini/.env</span>
+<span class="cmt"># Windows:     %USERPROFILE%\.gemini\.env</span>
+
+GOOGLE_GEMINI_BASE_URL=https://www.mhcoding.xyz
 GEMINI_API_KEY=YOUR_KEY
-GEMINI_MODEL=gemini-3-pro</code></pre>
-                                </div>
-                            </div>
-                            <div class="mt-auto pt-4">
-                                <h4 class="text-sm font-bold flex items-center gap-2 mb-2"><span class="text-brand">03</span> 启动 (settings.json)</h4>
-                                <div class="terminal-window">
-                                    <div class="terminal-header">
-                                        <span>~/.gemini/settings.json</span>
-                                        <button class="copy-btn" onclick="copyCode(this)"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
-                                    </div>
-                                    <pre><code class="language-json">{
-  "security": {
-    "auth": { "selectedType": "gemini-api-key" }
-  }
-}</code></pre>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
+GEMINI_MODEL=gemini-3-pro</pre>
                 </div>
+              </div>
             </div>
-        </section>
+          </div>
 
-        <!-- Image Break / Inspiration Section -->
-        <section class="border-b grid-divider relative h-64 md:h-96 overflow-hidden flex items-center justify-center">
-            <div class="absolute inset-0 bg-black z-10 opacity-40 dark:opacity-60 mix-blend-multiply"></div>
-            <img src="https://picsum.photos/id/0/1920/600" alt="Developer Workspace" class="absolute inset-0 w-full h-full object-cover grayscale" />
-            
-            <div class="relative z-20 text-center px-6">
-                <blockquote class="text-2xl md:text-4xl font-bold text-white tracking-tight mb-4">"Less, but better."</blockquote>
-                <p class="text-sm text-gray-300 tracking-widest uppercase">— Dieter Rams</p>
+          <div class="space-y-4">
+            <div class="flex gap-3 items-start">
+              <span class="step-num filled">4</span>
+              <div class="flex-1">
+                <h4 class="font-hand text-2xl">指定鉴权方式</h4>
+                <div class="terminal">
+                  <div class="terminal-bar"><span>~/.gemini/settings.json</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<pre>{
+  <span class="key">"security"</span>: {
+    <span class="key">"auth"</span>: {
+      <span class="key">"selectedType"</span>: <span class="str">"gemini-api-key"</span>
+    }
+  }
+}</pre>
+                </div>
+              </div>
             </div>
-        </section>
 
-        <!-- CTA Section -->
-        <section id="cta" class="py-32 bg-background text-center px-6">
-            <div class="max-w-2xl mx-auto">
-                <h2 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-6">连接未来</h2>
-                <p class="text-lg text-muted mb-10">只需一分钟，为你的终端装备最顶级的 AI 引擎。</p>
-                <!-- 更新为绝对路径以避免 404 -->
-                <a href="https://www.mhcoding.xyz/console" class="btn-primary !px-10 !py-4 text-lg">
-                    获取免费额度
-                </a>
+            <div class="flex gap-3 items-start">
+              <span class="step-num filled">5</span>
+              <div class="flex-1">
+                <h4 class="font-hand text-2xl">启动</h4>
+                <div class="terminal">
+                  <div class="terminal-bar"><span>$ run</span><button class="copy-btn" onclick="copyCode(this)">复制</button></div>
+<pre>gemini
+<span class="cmt"># 进入交互后输入：列出当前目录文件</span></pre>
+                </div>
+                <p class="font-pen text-sm text-[var(--red)] mt-2">
+                  没认到 Key？检查 .env 没有 BOM 头、变量名拼写完全一致。
+                </p>
+              </div>
             </div>
-        </section>
+          </div>
 
-    </main>
-
-    <!-- Minimalist Footer -->
-    <footer class="border-t grid-divider bg-surface py-12 px-6">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="flex items-center gap-3">
-                <svg viewBox="0 0 100 50" class="w-6 h-6 stroke-textMain dark:stroke-white" stroke-width="6" fill="none" stroke-linecap="square">
-                    <path d="M10 40 V10 L25 25 L40 10 V40" />
-                    <path d="M60 10 V40 M60 25 H90 M90 10 V40" />
-                </svg>
-                <span class="font-bold tracking-tight text-sm">MHcoding API</span>
-            </div>
-            
-            <div class="text-sm text-muted">
-                &copy; <span id="year"></span> MHcoding Infrastructure. Built for developers.
-            </div>
         </div>
-    </footer>
+      </div>
 
-    <!-- Global Toast Component -->
-    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 bg-textMain text-background text-sm font-bold shadow-[4px_4px_0px_rgba(37,99,235,1)] dark:shadow-[4px_4px_0px_rgba(56,189,248,1)] transition-all duration-300 opacity-0 pointer-events-none translate-y-4 z-50 flex items-center gap-2 border border-brand">
-        <i data-lucide="check" class="w-4 h-4"></i>
-        <span>内容已复制</span>
+    </div>
+  </section>
+
+  <!-- ===== TESTIMONIALS（评价墙） ===== -->
+  <section class="py-20 px-6 relative">
+    <div class="max-w-6xl mx-auto">
+
+      <div class="text-center mb-14">
+        <h2 class="section-title">他们都<span class="hl-y">怎么说</span></h2>
+        <p class="font-pen text-lg text-[var(--ink-soft)] mt-3">
+          抄回来的真实反馈，钉在墙上 ↓
+        </p>
+      </div>
+
+      <!-- 评价卡墙 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+
+        <!-- 1 -->
+        <div class="sketch-box p-5" style="transform: rotate(-1deg);">
+          <div class="flex gap-1 mb-2 text-[var(--highlight-y)]" style="filter: drop-shadow(1px 1px 0 var(--ink));">
+            <span class="text-xl">★</span><span class="text-xl">★</span><span class="text-xl">★</span><span class="text-xl">★</span><span class="text-xl">★</span>
+          </div>
+          <p class="font-pen text-base mb-4 leading-relaxed">"切过来一周，账单从原来一半都不到。Claude Code 跑长任务也不掉线。"</p>
+          <div class="flex items-center gap-2 pt-3 border-t border-dashed border-[var(--ink)]">
+            <div class="w-8 h-8 rounded-full bg-[var(--sticky-y)] border-2 border-[var(--ink)] flex items-center justify-center font-hand font-bold">L</div>
+            <div>
+              <p class="font-pen text-sm font-semibold leading-tight">@林同学</p>
+              <p class="font-pen text-xs text-[var(--ink-soft)] leading-tight">独立开发者</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 -->
+        <div class="sketch-box sketch-box-alt p-5" style="transform: rotate(0.8deg); background: var(--sticky-y);">
+          <div class="flex gap-1 mb-2 text-[var(--highlight-y)]" style="filter: drop-shadow(1px 1px 0 var(--ink));">
+            <span class="text-xl">★</span><span class="text-xl">★</span><span class="text-xl">★</span><span class="text-xl">★</span><span class="text-xl">★</span>
+          </div>
+          <p class="font-pen text-base mb-4 leading-relaxed">"Codex CLI 第一次配通就成了，文档抄得明白。"</p>
+          <div class="flex items-center gap-2 pt-3 border-t border-dashed border-[var(--ink)]">
+            <div class="w-8 h-8 rounded-full bg-[var(--paper)] border-2 border-[var(--ink)] flex items-center justify-center font-hand font-bold">Z</div>
+            <div>
+              <p class="font-pen text-sm font-semibold leading-tight">@周老板</p>
+              <p class="font-pen text-xs text-[var(--ink-soft)] leading-tight">小型工作室</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 -->
+        <div class="sketch-box p-5" style="transform: rotate(-0.6deg);">
+          <div class="flex gap-1 mb-2 text-[var(--highlight-y)]" style="filter: drop-shadow(1px 1px 0 var(--ink));">
+            <span class="text-xl">★</span><span class="text-xl">★</span><span class="text-xl">★</span><span class="text-xl">★</span><span class="text-xl">★</span>
+          </div>
+          <p class="font-pen text-base mb-4 leading-relaxed">"VVIP 1.5x 倍率，重度使用一个月省下来的够再充两次。"</p>
+          <div class="flex items-center gap-2 pt-3 border-t border-dashed border-[var(--ink)]">
+            <div class="w-8 h-8 rounded-full bg-[var(--sticky-b)] border-2 border-[var(--ink)] flex items-center justify-center font-hand font-bold">M</div>
+            <div>
+              <p class="font-pen text-sm font-semibold leading-tight">@Marcus</p>
+              <p class="font-pen text-xs text-[var(--ink-soft)] leading-tight">海外 Solo</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 -->
+        <div class="sketch-box sketch-box-alt p-5" style="transform: rotate(1.2deg);">
+          <div class="flex gap-1 mb-2 text-[var(--highlight-y)]" style="filter: drop-shadow(1px 1px 0 var(--ink));">
+            <span class="text-xl">★</span><span class="text-xl">★</span><span class="text-xl">★</span><span class="text-xl">★</span><span class="text-xl">★</span>
+          </div>
+          <p class="font-pen text-base mb-4 leading-relaxed">"流式没断过。换 base_url 这么点活就接上原生体验，值。"</p>
+          <div class="flex items-center gap-2 pt-3 border-t border-dashed border-[var(--ink)]">
+            <div class="w-8 h-8 rounded-full bg-[var(--sticky-g)] border-2 border-[var(--ink)] flex items-center justify-center font-hand font-bold">陈</div>
+            <div>
+              <p class="font-pen text-sm font-semibold leading-tight">@陈工</p>
+              <p class="font-pen text-xs text-[var(--ink-soft)] leading-tight">外包团队</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5 -->
+        <div class="sketch-box p-5" style="transform: rotate(-1.4deg); background: var(--sticky-p);">
+          <div class="flex gap-1 mb-2 text-[var(--highlight-y)]" style="filter: drop-shadow(1px 1px 0 var(--ink));">
+            <span class="text-xl">★</span><span class="text-xl">★</span><span class="text-xl">★</span><span class="text-xl">★</span><span class="text-xl">★</span>
+          </div>
+          <p class="font-pen text-base mb-4 leading-relaxed">"工单 12 小时回复，比官方快。出问题不卡。"</p>
+          <div class="flex items-center gap-2 pt-3 border-t border-dashed border-[var(--ink)]">
+            <div class="w-8 h-8 rounded-full bg-[var(--paper)] border-2 border-[var(--ink)] flex items-center justify-center font-hand font-bold">K</div>
+            <div>
+              <p class="font-pen text-sm font-semibold leading-tight">@Kev</p>
+              <p class="font-pen text-xs text-[var(--ink-soft)] leading-tight">SaaS 创业</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6 -->
+        <div class="sketch-box sketch-box-alt p-5" style="transform: rotate(0.9deg);">
+          <div class="flex gap-1 mb-2 text-[var(--highlight-y)]" style="filter: drop-shadow(1px 1px 0 var(--ink));">
+            <span class="text-xl">★</span><span class="text-xl">★</span><span class="text-xl">★</span><span class="text-xl">★</span><span class="text-xl">★</span>
+          </div>
+          <p class="font-pen text-base mb-4 leading-relaxed">"三个 CLI 一把 Key 全搞定，不用再单独管渠道。"</p>
+          <div class="flex items-center gap-2 pt-3 border-t border-dashed border-[var(--ink)]">
+            <div class="w-8 h-8 rounded-full bg-[var(--sticky-y)] border-2 border-[var(--ink)] flex items-center justify-center font-hand font-bold">A</div>
+            <div>
+              <p class="font-pen text-sm font-semibold leading-tight">@Alex</p>
+              <p class="font-pen text-xs text-[var(--ink-soft)] leading-tight">Full-stack</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 数据条（4 项） -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+        <div class="sketch-box p-5 text-center" style="transform: rotate(-0.6deg);">
+          <div class="text-[var(--blue)] mb-1">
+            <i data-lucide="users" class="w-7 h-7 inline-block"></i>
+          </div>
+          <p class="font-hand text-4xl font-bold leading-none">8,200<span class="text-[var(--red)]">+</span></p>
+          <p class="font-pen text-sm text-[var(--ink-soft)] mt-1">注册开发者</p>
+        </div>
+        <div class="sketch-box sketch-box-alt p-5 text-center" style="transform: rotate(0.6deg); background: var(--sticky-y);">
+          <div class="text-[var(--ink)] mb-1">
+            <i data-lucide="zap" class="w-7 h-7 inline-block"></i>
+          </div>
+          <p class="font-hand text-4xl font-bold leading-none">99.95<span class="text-base">%</span></p>
+          <p class="font-pen text-sm text-[var(--ink-soft)] mt-1">月可用率</p>
+        </div>
+        <div class="sketch-box p-5 text-center" style="transform: rotate(-0.4deg);">
+          <div class="text-[var(--green)] mb-1">
+            <i data-lucide="check-circle-2" class="w-7 h-7 inline-block"></i>
+          </div>
+          <p class="font-hand text-4xl font-bold leading-none">3<span class="text-2xl">CLI</span></p>
+          <p class="font-pen text-sm text-[var(--ink-soft)] mt-1">官方客户端全适配</p>
+        </div>
+        <div class="sketch-box sketch-box-alt p-5 text-center" style="transform: rotate(0.8deg);">
+          <div class="text-[var(--red)] mb-1">
+            <i data-lucide="rocket" class="w-7 h-7 inline-block"></i>
+          </div>
+          <p class="font-hand text-4xl font-bold leading-none">~120<span class="text-base">ms</span></p>
+          <p class="font-pen text-sm text-[var(--ink-soft)] mt-1">首字节延迟</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===== QUOTE ===== -->
+  <section class="py-24 px-6">
+    <div class="max-w-3xl mx-auto">
+      <div class="sketch-box sketch-box-alt p-10 md:p-14 text-center" style="transform: rotate(-0.5deg);">
+        <p class="font-hand text-4xl md:text-5xl mb-4 leading-tight">
+          "<span class="hl-y">Less</span>, but <span class="underline-wave">better</span>."
+        </p>
+        <p class="font-pen text-base text-[var(--ink-soft)] tracking-widest uppercase">— Dieter Rams</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA ===== -->
+  <section class="py-24 px-6 relative">
+    <svg class="doodle hidden md:block" style="top: 10%; right: 15%; width: 100px; height: 100px; opacity: 0.5;" viewBox="0 0 100 100" fill="none" stroke="#1F2937" stroke-width="2.5" stroke-linecap="round">
+      <path d="M50 15 L 60 40 L 85 42 L 65 58 L 73 82 L 50 68 L 27 82 L 35 58 L 15 42 L 40 40 Z"/>
+    </svg>
+
+    <div class="max-w-2xl mx-auto text-center">
+      <h2 class="section-title mb-6">就这样，<br/>开干吧。</h2>
+      <p class="font-pen text-lg text-[var(--ink-soft)] mb-10">注册送免费额度，先跑通再说。</p>
+      <a href="https://www.mhcoding.xyz/dashboard/overview" class="btn-sketch ink-bg text-2xl px-10 py-4">
+        开始使用 <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
+      </a>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="relative pt-20 pb-0 px-6 border-t-2 border-dashed border-[var(--ink)] overflow-hidden">
+    <div class="max-w-6xl mx-auto relative z-10">
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8 mb-16">
+
+        <!-- 左：品牌区 -->
+        <div class="md:col-span-5">
+          <div class="flex items-center gap-3 mb-4">
+            <svg viewBox="0 0 100 50" class="w-8 h-8" stroke="#1F2937" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 40 V10 L25 25 L40 10 V40" />
+              <path d="M60 10 V40 M60 25 H90 M90 10 V40" />
+            </svg>
+            <span class="font-hand text-3xl font-bold">MHcoding</span>
+          </div>
+          <p class="font-pen text-base text-[var(--ink-soft)] mb-6 max-w-sm leading-relaxed">
+            一把 Key 接管 Claude Code、Codex、Gemini CLI。<br/>
+            <span class="hl-y">官价对齐，按 token 实计。</span>
+          </p>
+
+          <div class="space-y-2 font-pen text-sm">
+            <div class="flex items-center gap-2 text-[var(--ink-soft)]">
+              <i data-lucide="message-circle" class="w-4 h-4"></i>
+              <span>微信：MHcoding-support</span>
+            </div>
+            <div class="flex items-center gap-2 text-[var(--ink-soft)]">
+              <i data-lucide="mail" class="w-4 h-4"></i>
+              <span>support@mhcoding.xyz</span>
+            </div>
+          </div>
+
+          <a href="https://www.mhcoding.xyz/dashboard/overview" class="btn-sketch mt-7 !text-lg">
+            充值 / 升档 <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+          </a>
+        </div>
+
+        <!-- 右：链接列 -->
+        <div class="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8">
+
+          <div>
+            <h4 class="font-hand text-xl font-bold mb-3 underline-wave inline-block">产品</h4>
+            <ul class="space-y-2 font-pen text-sm">
+              <li><a href="https://www.mhcoding.xyz/pricing" class="hover:text-[var(--red)] transition-colors">价格档位</a></li>
+              <li><a href="https://www.mhcoding.xyz/dashboard/overview" class="hover:text-[var(--red)] transition-colors">控制台</a></li>
+              <li><a href="https://www.mhcoding.xyz/keys" class="hover:text-[var(--red)] transition-colors">API Keys</a></li>
+              <li><a href="https://www.mhcoding.xyz/docs" class="hover:text-[var(--red)] transition-colors">接入文档</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="font-hand text-xl font-bold mb-3 underline-wave inline-block">客户端</h4>
+            <ul class="space-y-2 font-pen text-sm">
+              <li><a href="#cli-setup" class="hover:text-[var(--red)] transition-colors">Claude Code</a></li>
+              <li><a href="#cli-setup" class="hover:text-[var(--red)] transition-colors">Codex CLI</a></li>
+              <li><a href="#cli-setup" class="hover:text-[var(--red)] transition-colors">Gemini CLI</a></li>
+              <li><a href="https://www.mhcoding.xyz/models" class="hover:text-[var(--red)] transition-colors">模型清单</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="font-hand text-xl font-bold mb-3 underline-wave inline-block">法务</h4>
+            <ul class="space-y-2 font-pen text-sm">
+              <li><a href="https://www.mhcoding.xyz/privacy" class="hover:text-[var(--red)] transition-colors">隐私政策</a></li>
+              <li><a href="https://www.mhcoding.xyz/terms" class="hover:text-[var(--red)] transition-colors">服务条款</a></li>
+              <li><a href="https://www.mhcoding.xyz/refund" class="hover:text-[var(--red)] transition-colors">退款说明</a></li>
+              <li><a href="https://beian.miit.gov.cn/" class="hover:text-[var(--red)] transition-colors">ICP 备案</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部小字 -->
+      <div class="pt-6 border-t-2 border-dashed border-[var(--ink)] flex flex-col md:flex-row justify-between items-center gap-3">
+        <p class="font-pen text-sm text-[var(--ink-soft)]">
+          &copy; <span id="year"></span> 明珩科技（福州）有限公司 · Built honestly.
+        </p>
+        <p class="font-pen text-sm text-[var(--ink-soft)]">
+          福州 · 给开发者的草稿本
+        </p>
+      </div>
     </div>
 
-    <script>
-        // Initialize Lucide Icons
-        lucide.createIcons();
+    <!-- 巨型半透明品牌水印 -->
+    <div aria-hidden="true" class="pointer-events-none select-none w-full overflow-hidden mt-8" style="line-height: 0.85;">
+      <p class="font-hand font-bold text-center whitespace-nowrap" style="font-size: clamp(6rem, 22vw, 18rem); color: rgba(31, 41, 55, 0.07); letter-spacing: -0.04em; transform: translateY(20%);">
+        MHcoding
+      </p>
+    </div>
+  </footer>
 
-        // Footer Year
-        document.getElementById('year').textContent = new Date().getFullYear();
+  <!-- Toast -->
+  <div id="toast">已抄入剪贴板</div>
 
-        // Theme Management
-        const themeToggle = document.getElementById('themeToggle');
-        const html = document.documentElement;
-        
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            html.classList.add('dark');
-        } else {
-            html.classList.remove('dark');
-        }
+  <script>
+    lucide.createIcons();
+    document.getElementById('year').textContent = new Date().getFullYear();
 
-        themeToggle.addEventListener('click', () => {
-            html.classList.toggle('dark');
-            localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
-        });
+    const toast = document.getElementById('toast');
+    let toastTimer;
+    function showToast(msg) {
+      if (msg) toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
+    }
 
-        // Toast Notification System
-        const toast = document.getElementById('toast');
-        let toastTimeout;
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast('已抄入剪贴板');
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); showToast('已抄入剪贴板'); } catch {}
+        document.body.removeChild(ta);
+      }
+    }
 
-        function showToast(message) {
-            if(message) toast.querySelector('span').textContent = message;
-            toast.classList.remove('opacity-0', 'translate-y-4');
-            
-            clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-4');
-            }, 2000);
-        }
+    function copyCode(btn) {
+      const pre = btn.closest('.terminal').querySelector('pre');
+      if (pre) copyText(pre.textContent.trim());
+    }
 
-        // Copy Code Functionality
-        async function copyText(text) {
-            try {
-                await navigator.clipboard.writeText(text);
-                showToast();
-            } catch (err) {
-                const textArea = document.createElement("textarea");
-                textArea.value = text;
-                document.body.appendChild(textArea);
-                textArea.select();
-                try {
-                    document.execCommand('copy');
-                    showToast();
-                } catch (e) {
-                    console.error('Copy failed', e);
-                }
-                document.body.removeChild(textArea);
-            }
-        }
+    window.copyText = copyText;
+    window.copyCode = copyCode;
+  </script>
 
-        // Bind copy buttons to their respective code blocks
-        window.copyCode = function(btnElement) {
-            const codeBlock = btnElement.closest('.terminal-window').querySelector('code');
-            if (codeBlock) {
-                copyText(codeBlock.textContent);
-                
-                const icon = btnElement.querySelector('i');
-                const originalIcon = icon.getAttribute('data-lucide');
-                icon.setAttribute('data-lucide', 'check');
-                lucide.createIcons();
-                
-                setTimeout(() => {
-                    icon.setAttribute('data-lucide', originalIcon);
-                    lucide.createIcons();
-                }, 2000);
-            }
-        };
-    </script>
 </body>
 </html>
