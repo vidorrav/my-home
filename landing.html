@@ -368,9 +368,6 @@
         <path d="M60 10 V40 M60 25 H90 M90 10 V40" />
       </svg>
     </div>
-    <a href="https://www.mhcoding.xyz/dashboard/overview" class="btn-sketch !text-base !py-2 !px-4">
-      控制台 <i data-lucide="arrow-right" class="w-4 h-4"></i>
-    </a>
   </div>
 
   <!-- ===== HERO ===== -->
@@ -479,12 +476,7 @@
             <span class="tier-rate">2x</span>
             <span class="font-pen text-base text-[var(--ink-soft)]">官价倍率</span>
           </div>
-          <p class="font-pen text-base mb-4">全部渠道按 2 倍计费。开始尝试 / 小流量调试期使用。</p>
-          <ul class="font-pen text-base space-y-1.5">
-            <li class="flex gap-2"><span class="text-[var(--ink-soft)]">·</span> 全模型可用</li>
-            <li class="flex gap-2"><span class="text-[var(--ink-soft)]">·</span> 标准并发</li>
-            <li class="flex gap-2"><span class="text-[var(--ink-soft)]">·</span> 工单 24h 响应</li>
-          </ul>
+          <p class="font-pen text-base mb-2">全部渠道按 2 倍计费。开始尝试 / 小流量调试期使用。</p>
         </div>
 
         <!-- VIP -->
@@ -497,12 +489,7 @@
             <span class="tier-rate">1.75x</span>
             <span class="font-pen text-base text-[var(--ink-soft)]">部分渠道</span>
           </div>
-          <p class="font-pen text-base mb-4">高频使用渠道降至 1.75 倍，其余渠道维持 2 倍。</p>
-          <ul class="font-pen text-base space-y-1.5">
-            <li class="flex gap-2"><span>·</span> <span class="hl-y">主力模型 1.75x</span></li>
-            <li class="flex gap-2"><span>·</span> 提升并发上限</li>
-            <li class="flex gap-2"><span>·</span> 专属技术群</li>
-          </ul>
+          <p class="font-pen text-base mb-2">高频使用渠道降至 1.75 倍，其余渠道维持 2 倍。</p>
         </div>
 
         <!-- VVIP -->
@@ -515,12 +502,7 @@
             <span class="tier-rate">1.5x</span>
             <span class="font-pen text-base opacity-80">部分渠道</span>
           </div>
-          <p class="font-pen text-base mb-4 opacity-95">最低倍率。重度使用 / 团队协作场景。</p>
-          <ul class="font-pen text-base space-y-1.5">
-            <li class="flex gap-2"><span>·</span> <span style="color: var(--highlight-y);">主力模型 1.5x</span></li>
-            <li class="flex gap-2"><span>·</span> 最高并发 / 优先调度</li>
-            <li class="flex gap-2"><span>·</span> 1v1 技术对接</li>
-          </ul>
+          <p class="font-pen text-base mb-2 opacity-95">最低倍率。重度使用 / 团队协作场景。</p>
           <div class="dog-ear" style="background: linear-gradient(135deg, transparent 50%, rgba(255, 252, 242, 0.15) 50%);"></div>
         </div>
       </div>
@@ -921,7 +903,7 @@ GEMINI_MODEL=gemini-3-pro</pre>
           <div class="flex gap-1 mb-2 text-[var(--highlight-y)]" style="filter: drop-shadow(1px 1px 0 var(--ink));">
             <span class="text-xl">★</span><span class="text-xl">★</span><span class="text-xl">★</span><span class="text-xl">★</span><span class="text-xl">★</span>
           </div>
-          <p class="font-pen text-base mb-4 leading-relaxed">"工单 12 小时回复，比官方快。出问题不卡。"</p>
+          <p class="font-pen text-base mb-4 leading-relaxed">"出问题群里喊一嗓子就有人回，体感不卡。"</p>
           <div class="flex items-center gap-2 pt-3 border-t border-dashed border-[var(--ink)]">
             <div class="w-8 h-8 rounded-full bg-[var(--paper)] border-2 border-[var(--ink)] flex items-center justify-center font-hand font-bold">K</div>
             <div>
@@ -1009,6 +991,107 @@ GEMINI_MODEL=gemini-3-pro</pre>
     </div>
   </section>
 
+  <!-- ===== COMMUNITY（找到我们） ===== -->
+  <section class="py-20 px-6 relative">
+    <!-- 背景 doodles -->
+    <svg class="doodle hidden md:block" style="top: 8%; left: 8%; width: 80px; height: 80px; opacity: 0.4;" viewBox="0 0 100 100" fill="none" stroke="#1F2937" stroke-width="2" stroke-linecap="round">
+      <path d="M30 50 Q 50 20, 70 50 T 90 70" stroke-dasharray="4 6"/>
+    </svg>
+    <svg class="doodle hidden md:block" style="bottom: 12%; right: 6%; width: 90px; height: 90px; opacity: 0.5;" viewBox="0 0 100 100" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round">
+      <circle cx="50" cy="50" r="30" stroke-dasharray="6 4"/>
+      <path d="M40 50 L 48 58 L 62 42" stroke-width="2.5"/>
+    </svg>
+
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-14">
+        <h2 class="section-title">来<span class="hl-p">群里</span>蹲</h2>
+        <p class="font-pen text-lg text-[var(--ink-soft)] mt-3">
+          配置遇到坑、想催个新模型、或者只是想聊技术 —— <span class="hl-y">直接进群</span>
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+
+        <!-- 微信卡 -->
+        <div class="sketch-box p-7 md:p-8 relative" style="transform: rotate(-0.8deg); background: var(--sticky-g);">
+          <div class="tape" style="background: rgba(134, 239, 172, 0.85); width: 100px;"></div>
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-12 h-12 border-2.5 border-[var(--ink)] rounded-[50%_12%_50%_12%] bg-[var(--paper)] flex items-center justify-center">
+              <i data-lucide="message-circle" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h3 class="font-hand text-3xl font-bold leading-none">加微信</h3>
+              <p class="font-pen text-sm text-[var(--ink-soft)] mt-1">1 v 1 答疑 · 报问题最快</p>
+            </div>
+          </div>
+
+          <p class="font-pen text-base mb-4 leading-relaxed">
+            遇到 401、配置不通、想升档咨询，<span class="hl-y">直接发我微信</span>。备注"MHcoding"通过更快。
+          </p>
+
+          <!-- 账号块 -->
+          <div class="bg-[var(--paper)] border-2 border-dashed border-[var(--ink)] rounded-[8px_22px_8px_22px] p-4 flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <p class="font-pen text-xs text-[var(--ink-soft)] mb-1">微信号</p>
+              <p class="font-mono text-base md:text-lg font-semibold truncate">yecx20030709</p>
+            </div>
+            <button class="copy-btn shrink-0 !text-base !px-3 !py-1.5" onclick="copyText('yecx20030709')">
+              <i data-lucide="copy" class="w-3.5 h-3.5 inline-block"></i> 复制
+            </button>
+          </div>
+
+          <p class="font-hand text-base text-[var(--ink-soft)] mt-3" style="transform: rotate(-1deg); display: inline-block;">
+            ↑ 复制后到微信搜索添加
+          </p>
+        </div>
+
+        <!-- QQ 群卡 -->
+        <div class="sketch-box sketch-box-alt p-7 md:p-8 relative" style="transform: rotate(0.8deg); background: var(--sticky-b);">
+          <div class="tape" style="background: rgba(147, 197, 253, 0.85); width: 100px;"></div>
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-12 h-12 border-2.5 border-[var(--ink)] rounded-[12%_50%_12%_50%] bg-[var(--paper)] flex items-center justify-center">
+              <i data-lucide="users" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h3 class="font-hand text-3xl font-bold leading-none">QQ 群</h3>
+              <p class="font-pen text-sm text-[var(--ink-soft)] mt-1">公告 · 故障通知 · 技术交流</p>
+            </div>
+          </div>
+
+          <p class="font-pen text-base mb-4 leading-relaxed">
+            <span class="hl-y">MHcoding 1群</span>。系统维护、新模型上架、bug 通报第一时间在群里发。
+          </p>
+
+          <!-- 群号块 -->
+          <div class="bg-[var(--paper)] border-2 border-dashed border-[var(--ink)] rounded-[22px_8px_22px_8px] p-4 flex items-center justify-between gap-3 mb-4">
+            <div class="min-w-0">
+              <p class="font-pen text-xs text-[var(--ink-soft)] mb-1">群号</p>
+              <p class="font-mono text-base md:text-lg font-semibold truncate">1076355849</p>
+            </div>
+            <button class="copy-btn shrink-0 !text-base !px-3 !py-1.5" onclick="copyText('1076355849')">
+              <i data-lucide="copy" class="w-3.5 h-3.5 inline-block"></i> 复制
+            </button>
+          </div>
+
+          <a href="https://qm.qq.com/q/zIE0Oegxpe" target="_blank" rel="noopener" class="btn-sketch w-full justify-center !text-xl !py-3" style="transform: rotate(-1deg);">
+            <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
+            一键加群
+          </a>
+        </div>
+      </div>
+
+      <!-- 底部温馨提示条 -->
+      <div class="mt-10 max-w-3xl mx-auto">
+        <div class="sketch-box p-4 text-center" style="transform: rotate(-0.3deg);">
+          <p class="font-pen text-base">
+            <span class="font-hand text-xl">P.S.</span>
+            技术问题群里抛、商务合作走微信、其他事项发邮箱 —— <span class="hl-y">各取所需</span>。
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ===== FOOTER ===== -->
   <footer class="relative pt-20 pb-0 px-6 border-t-2 border-dashed border-[var(--ink)] overflow-hidden">
     <div class="max-w-6xl mx-auto relative z-10">
@@ -1032,7 +1115,13 @@ GEMINI_MODEL=gemini-3-pro</pre>
           <div class="space-y-2 font-pen text-sm">
             <div class="flex items-center gap-2 text-[var(--ink-soft)]">
               <i data-lucide="message-circle" class="w-4 h-4"></i>
-              <span>微信：MHcoding-support</span>
+              <span>微信：yecx20030709</span>
+            </div>
+            <div class="flex items-center gap-2 text-[var(--ink-soft)]">
+              <i data-lucide="users" class="w-4 h-4"></i>
+              <a href="https://qm.qq.com/q/zIE0Oegxpe" target="_blank" rel="noopener" class="hover:text-[var(--red)] transition-colors">
+                QQ 群：1076355849（MHcoding1群）
+              </a>
             </div>
             <div class="flex items-center gap-2 text-[var(--ink-soft)]">
               <i data-lucide="mail" class="w-4 h-4"></i>
