@@ -596,6 +596,40 @@
       letter-spacing: -0.05em;
     }
 
+    .sr-only {
+      position: absolute;
+      overflow: hidden;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      border: 0;
+      clip: rect(0 0 0 0);
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    .tier-bolts {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .tier-bolts svg {
+      display: block;
+      width: 15px;
+      height: 22px;
+      color: var(--sun);
+      stroke: var(--ink);
+      stroke-width: 1.4;
+      fill: currentColor;
+    }
+
+    .tier-bolts svg.dim {
+      color: #e2e0d6;
+      stroke: #bdbcb3;
+    }
+
     .pricing-note {
       display: flex;
       align-items: center;
@@ -1402,7 +1436,7 @@
       }
 
       .pricing-tier > div:nth-child(2)::before {
-        content: "Cumulative top-up";
+        content: "Top-up level";
       }
 
       .pricing-tier > div:nth-child(3)::before {
@@ -1504,6 +1538,12 @@
   </style>
 </head>
 <body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="icon-bolt" viewBox="0 0 24 24">
+      <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z" stroke-linejoin="round" />
+    </symbol>
+  </svg>
+
   <main id="top">
     <section class="hero">
       <div class="container hero-grid">
@@ -1591,39 +1631,54 @@
         <div class="pricing-board">
           <div class="pricing-row pricing-header">
             <div>Tier</div>
-            <div>Cumulative top-up</div>
+            <div>Top-up level</div>
             <div>Billing rate</div>
             <div>Best for</div>
           </div>
           <div class="pricing-row pricing-tier">
             <div class="tier-name">Starter</div>
-            <div>Below ¥500</div>
+            <div>
+              <span class="tier-bolts" aria-hidden="true"><svg><use href="#icon-bolt" /></svg><svg class="dim"><use href="#icon-bolt" /></svg><svg class="dim"><use href="#icon-bolt" /></svg><svg class="dim"><use href="#icon-bolt" /></svg><svg class="dim"><use href="#icon-bolt" /></svg></span>
+              <span class="sr-only">Level 1 of 5</span>
+            </div>
             <div class="price-multiplier">2.00×</div>
             <div>Trying the platform and light development work.</div>
           </div>
           <div class="pricing-row pricing-tier featured">
             <div class="tier-name">VIP <span class="tier-badge">Popular</span></div>
-            <div>¥500–¥749</div>
+            <div>
+              <span class="tier-bolts" aria-hidden="true"><svg><use href="#icon-bolt" /></svg><svg><use href="#icon-bolt" /></svg><svg class="dim"><use href="#icon-bolt" /></svg><svg class="dim"><use href="#icon-bolt" /></svg><svg class="dim"><use href="#icon-bolt" /></svg></span>
+              <span class="sr-only">Level 2 of 5</span>
+            </div>
             <div class="price-multiplier">1.75×</div>
             <div>Frequent use on selected high-volume routes.</div>
           </div>
           <div class="pricing-row pricing-tier">
             <div class="tier-name">VVIP</div>
-            <div>¥750–¥1,499</div>
+            <div>
+              <span class="tier-bolts" aria-hidden="true"><svg><use href="#icon-bolt" /></svg><svg><use href="#icon-bolt" /></svg><svg><use href="#icon-bolt" /></svg><svg class="dim"><use href="#icon-bolt" /></svg><svg class="dim"><use href="#icon-bolt" /></svg></span>
+              <span class="sr-only">Level 3 of 5</span>
+            </div>
             <div class="price-multiplier">1.50×</div>
             <div>Heavy individual use and small teams.</div>
           </div>
           <div class="pricing-row pricing-tier">
             <div class="tier-name">SVIP</div>
-            <div>¥1,500–¥2,999</div>
+            <div>
+              <span class="tier-bolts" aria-hidden="true"><svg><use href="#icon-bolt" /></svg><svg><use href="#icon-bolt" /></svg><svg><use href="#icon-bolt" /></svg><svg><use href="#icon-bolt" /></svg><svg class="dim"><use href="#icon-bolt" /></svg></span>
+              <span class="sr-only">Level 4 of 5</span>
+            </div>
             <div class="price-multiplier">1.25×</div>
             <div>Sustained daily agent workloads across multiple tools.</div>
           </div>
           <div class="pricing-row pricing-tier">
             <div class="tier-name">Super VIP <span class="tier-badge">Top</span></div>
-            <div>¥3,000+</div>
+            <div>
+              <span class="tier-bolts" aria-hidden="true"><svg><use href="#icon-bolt" /></svg><svg><use href="#icon-bolt" /></svg><svg><use href="#icon-bolt" /></svg><svg><use href="#icon-bolt" /></svg><svg><use href="#icon-bolt" /></svg></span>
+              <span class="sr-only">Level 5 of 5</span>
+            </div>
             <div class="price-multiplier">1.25×</div>
-            <div>Same rate as SVIP, plus 10% off every future top-up. For teams running agents continuously.</div>
+            <div>Top-tier rate plus an ongoing top-up bonus. For teams running agents continuously.</div>
           </div>
           <div class="pricing-note">
             <span>Tiers upgrade automatically and never downgrade. Rates for individual models and routes can vary. The live pricing page is always the source of truth.</span>
